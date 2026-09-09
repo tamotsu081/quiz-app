@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>脳神経障害看護 徹底網羅 穴埋め演習</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 12px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .instruction {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffeeba;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            background-color: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #eaf4fc;
+            padding: 10px 15px;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .question-box {
+            font-size: 1.2rem;
+            line-height: 2.4;
+            margin-bottom: 30px;
+            background-color: #fafafa;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .blank-input {
+            display: inline-block;
+            width: 130px;
+            padding: 8px 12px;
+            font-size: 1.05rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+            margin: 0 4px;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+
+        .blank-input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+        }
+
+        .blank-input.correct {
+            border-color: var(--success-color);
+            background-color: #e8f8f0;
+            color: #1e7e34;
+            font-weight: bold;
+        }
+
+        .blank-input.incorrect {
+            border-color: var(--error-color);
+            background-color: #fdf2f2;
+            color: #bd2130;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-next {
+            background-color: var(--success-color);
+            margin-top: 20px;
+        }
+
+        .btn-next:hover {
+            background-color: #219150;
+        }
+
+        .feedback-box {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ans-list {
+            margin-top: 15px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .ans-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            border-left: 4px solid #ccc;
+            font-size: 1.05rem;
+        }
+
+        .ans-item.item-ok { border-left-color: var(--success-color); }
+        .ans-item.item-ng { border-left-color: var(--error-color); }
+
+        .status-ok { color: var(--success-color); font-weight: bold; margin-right: 10px; }
+        .status-ng { color: var(--error-color); font-weight: bold; margin-right: 10px; }
+
+        .explanation {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            font-size: 1rem;
+            color: #444;
+            line-height: 1.7;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 30px 0;
+        }
+
+        .citation-tag {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>脳神経障害看護 徹底網羅 穴埋め演習</h1>
+    
+    <div id="quiz-screen">
+        <div class="instruction">
+            💡 <strong>ヒント:</strong> 複数の空欄が並んでいる箇所（例：三徴など）は、<strong>どの順番で解答しても正解</strong>になるよう設計されています。
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">問題 1 / 25</div>
+        </div>
+
+        <div class="section-title" id="section-title"></div>
+        
+        <div class="question-box" id="question-box">
+            <!-- JavaScriptが問題をここに挿入します -->
+        </div>
+
+        <button class="btn" id="submit-btn" onclick="checkAnswers()">判定する</button>
+
+        <div class="feedback-box" id="feedback-box">
+            <h2 id="feedback-title" style="margin-top:0;"></h2>
+            <ul id="ans-details" class="ans-list"></ul>
+            <div id="explanation-text" class="explanation"></div>
+            <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h2>全問演習完了！</h2>
+        <p>資料内の全領域の復習が完了しました。</p>
+        <div class="score-display" id="final-score"></div>
+        <p id="score-comment" style="font-size: 1.2rem; margin-bottom: 40px;"></p>
+        <button class="btn" onclick="location.reload()">最初からやり直す</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            section: "第1章：脳神経障害をもつ人の特徴 (1)",
+            template: "脳は生命の中枢（脳幹：【0】、【1】、【2】、視床下部）であり、【3】障害、【4】障害、【5】障害、【6】障害など、生命に関わる機能の重篤な異常が起こりやすい。[cite: 9]",
+            blanks: [
+                { answers: ["中脳", "ちゅうのう"], group: "noukan", label: "脳幹の部位" },
+                { answers: ["橋", "きょう"], group: "noukan", label: "脳幹の部位" },
+                { answers: ["延髄", "えんずい"], group: "noukan", label: "脳幹の部位" },
+                { answers: ["意識", "いしき"], group: "kinou", label: "障害機能" },
+                { answers: ["呼吸", "こきゅう"], group: "kinou", label: "障害機能" },
+                { answers: ["循環", "じゅんかん"], group: "kinou", label: "障害機能" },
+                { answers: ["体温調節", "たいおんちょうせつ", "体温"], group: "kinou", label: "障害機能" }
+            ],
+            explanation: "脳は生命の中枢（脳幹：中脳、橋、延髄、視床下部）です。意識障害、呼吸障害、循環障害、体温調節障害など、生命に関わる機能の重篤な異常が起こりやすいのが特徴です。[cite: 9]"
+        },
+        {
+            section: "第1章：脳神経障害をもつ人の特徴 (2)",
+            template: "【0】・【1】・【2】を防ぐことで脳ヘルニアを防ぐ。高度になると脳ヘルニアや血管の【3】へ進展する危険がある。[cite: 9]",
+            blanks: [
+                { answers: ["頭蓋内圧亢進", "とうがいないあつこうしん", "頭蓋内圧亢進症"], group: "boushi", label: "防ぐべき状態" },
+                { answers: ["脳浮腫", "のうふしゅ"], group: "boushi", label: "防ぐべき状態" },
+                { answers: ["脳血管攣縮", "のうけっかんれんしゅく", "血管攣縮"], group: "boushi", label: "防ぐべき状態" },
+                { answers: ["再破裂", "さいはれつ"], label: "血管の..." }
+            ],
+            explanation: "頭蓋内圧亢進・脳浮腫・脳血管攣縮を防ぐことで脳ヘルニアを防ぎます。高度になると脳ヘルニアや血管の再破裂（再発のおそれ）へ進展する危険があります。[cite: 9]"
+        },
+        {
+            section: "第1章：脳神経障害をもつ人の特徴 (3)",
+            template: "急性期の不適切なケアによる合併症：嚥下障害に伴う【0】、排泄障害に伴う【1】、循環障害に伴う【2】、関節拘縮や褥瘡。[cite: 9]",
+            blanks: [
+                { answers: ["誤嚥性肺炎", "ごえんせいはいえん", "肺炎"], label: "呼吸器合併症" },
+                { answers: ["尿路感染症", "にょうろかんせんしょう", "尿路感染"], label: "泌尿器合併症" },
+                { answers: ["深部静脈血栓症", "しんぶじょうみゃくけっせんしょう", "DVT", "血栓症"], label: "循環器合併症" }
+            ],
+            explanation: "嚥下障害に伴う誤嚥性肺炎、排泄障害に伴う尿路感染症、循環障害に伴う深部静脈血栓症などが、不適切なケアによって引き起こされます。[cite: 9]"
+        },
+        {
+            section: "第1章：脳神経障害をもつ人の特徴 (4)",
+            template: "外観の変化として、【0】による顔貌の変化、【1】病や【2】病などにみられる【3】運動が起こる。また突然の発症により患者は混乱しやすく、【4】状態に陥り闘病意欲を失うことがある。[cite: 9]",
+            blanks: [
+                { answers: ["顔面麻痺", "がんめんまひ"], label: "顔貌の変化" },
+                { answers: ["ハンチントン", "はんちんとん"], group: "disease", label: "疾患名" },
+                { answers: ["パーキンソン", "ぱーきんそん"], group: "disease", label: "疾患名" },
+                { answers: ["不随意", "ふずいい"], label: "運動障害" },
+                { answers: ["うつ", "鬱", "うつ病"], label: "心理状態" }
+            ],
+            explanation: "顔面麻痺による顔貌の変化、ハンチントン病やパーキンソン病などにみられる不随意運動、姿勢・歩行・動作障害が起こります。心理的にはうつ状態に陥ることがあります。[cite: 9]"
+        },
+        {
+            section: "第2章：脳卒中の分類と脳梗塞 (1)",
+            template: "脳梗塞は脳血管疾患の死亡原因の約【0】%を占める。一過性脳虚血発作（TIA）は【1】分以内（長くても【2】時間以内）に完全に消失するものであり、脳梗塞の前駆発作として重要。[cite: 9]",
+            blanks: [
+                { answers: ["60", "６０"], label: "割合(%)" },
+                { answers: ["数", "数分", "すう"], label: "時間(分)" },
+                { answers: ["24", "２４", "24時間", "二十四"], label: "上限時間" }
+            ],
+            explanation: "脳梗塞は脳血管疾患の死亡原因の約60%を占めます。TIAは数分以内（長くても24時間以内）に完全に消失します。[cite: 9]"
+        },
+        {
+            section: "第2章：脳卒中の分類と脳梗塞 (2)",
+            template: "中大脳動脈領域の障害では、【0】偏視、片麻痺、【1】、【2】、【3】、【4】などがみられる。前大脳動脈の障害では、【5】失禁や【6】機能低下がみられる。[cite: 9]",
+            blanks: [
+                { answers: ["共同", "きょうどう"], label: "偏視の種類" },
+                { answers: ["失語", "しつご", "失語症"], group: "kouji", label: "高次脳機能障害" },
+                { answers: ["失行", "しっこう"], group: "kouji", label: "高次脳機能障害" },
+                { answers: ["失認", "しつにん"], group: "kouji", label: "高次脳機能障害" },
+                { answers: ["半側空間無視", "はんそくくうかんむし", "空間無視"], group: "kouji", label: "高次脳機能障害" },
+                { answers: ["尿", "にょう"], label: "排泄障害" },
+                { answers: ["精神", "せいしん"], label: "機能低下" }
+            ],
+            explanation: "中大脳動脈領域では意識障害、共同偏視、片麻痺、失語、失行、失認、半側空間無視が起こります。前大脳動脈では尿失禁、精神機能低下が特徴です。[cite: 9]"
+        },
+        {
+            section: "第2章：脳卒中の分類と脳梗塞 (3)",
+            template: "後大脳動脈の血行障害では、反対側の感覚障害、片麻痺、【0】、記憶障害、【1】神経麻痺がみられる。椎骨動脈では小脳失調、【2】障害、【3】障害がみられる。[cite: 9]",
+            blanks: [
+                { answers: ["同名半盲", "どうめいはんもう"], label: "視覚障害" },
+                { answers: ["動眼", "どうがん"], label: "脳神経" },
+                { answers: ["嚥下", "えんげ"], group: "bulbar", label: "球麻痺症状" },
+                { answers: ["構音", "こうおん"], group: "bulbar", label: "球麻痺症状" }
+            ],
+            explanation: "後大脳動脈障害では同名半盲、動眼神経麻痺が特徴的です。椎骨動脈障害では嚥下障害、構音障害などが現れます。[cite: 9]"
+        },
+        {
+            section: "第2章：脳卒中の分類と脳梗塞 (4)",
+            template: "【0】梗塞は直径15mm以下の血管が詰まる。アテローム血栓性梗塞は【1】動脈の狭窄部に血栓が付着する。【2】は心房細動等が基礎疾患で、前駆症状（TIA）が【3】、意識障害が【4】重症化しやすい。[cite: 9]",
+            blanks: [
+                { answers: ["ラクナ", "らくな"], label: "梗塞の種類" },
+                { answers: ["太い", "ふとい"], label: "血管の太さ" },
+                { answers: ["心原性脳塞栓症", "しんげんせいのうそくせんしょう", "心原性脳塞栓"], label: "梗塞の種類" },
+                { answers: ["なし", "無い", "ない"], label: "有無" },
+                { answers: ["多い", "おおい"], label: "頻度" }
+            ],
+            explanation: "ラクナ梗塞は比較的細い血管が詰まります。アテローム血栓性梗塞は太い動脈が原因です。心原性脳塞栓症は前駆症状がなく突然発症し重症化しやすいです。[cite: 9]"
+        },
+        {
+            section: "第2章：脳卒中の分類と脳梗塞 (5)",
+            template: "発症【0】〜【1】時間後にCTで低吸収域として出現。早期にはMRIの【2】画像が有効。完全虚血周囲の不完全虚血領域を【3】と呼ぶ。障害細胞から【4】が放出され、【5】神経細胞死現象を引き起こす。[cite: 9]",
+            blanks: [
+                { answers: ["12", "１２"], group: "time", label: "時間下限" },
+                { answers: ["24", "２４"], group: "time", label: "時間上限" },
+                { answers: ["拡散強調", "かくさんきょうちょう", "DWI"], label: "MRI画像" },
+                { answers: ["ペナンブラ", "penumbra"], label: "不完全虚血領域" },
+                { answers: ["フリーラジカル", "ふりーらじかる"], label: "放出物質" },
+                { answers: ["遅発性", "ちはつせい"], label: "細胞死の種類" }
+            ],
+            explanation: "CTでは12〜24時間後に低吸収域が出現します。早期発見にはMRI拡散強調画像が有効です。ペナンブラは救命可能な領域ですが、フリーラジカルによる遅発性神経細胞死で被害が拡大します。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (1)",
+            template: "頭蓋内腔は、脳実質（約【0】%）、脳脊髄液（約【1】%）、血液（約【2】%）で平衡を保つ。正常頭蓋内圧は【3】〜【4】mmH2O。急性期のクッシング現象は【5】・血圧【6】である。[cite: 9]",
+            blanks: [
+                { answers: ["80", "８０"], label: "脳実質(%)" },
+                { answers: ["10", "１０"], group: "ten", label: "髄液(%)" },
+                { answers: ["10", "１０"], group: "ten", label: "血液(%)" },
+                { answers: ["60", "６０"], label: "正常圧下限" },
+                { answers: ["180", "１８０"], label: "正常圧上限" },
+                { answers: ["徐脈", "じょみゃく"], label: "脈拍の変化" },
+                { answers: ["上昇", "じょうしょう", "高い", "上がる"], label: "血圧の変化" }
+            ],
+            explanation: "脳実質（約80%）、脳脊髄液（約10%）、血液（約10%）のバランスで保たれます。正常圧は60〜180 mmH2Oです。クッシング現象は徐脈・血圧上昇を示します。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (2)",
+            template: "慢性頭蓋内圧亢進の三徴は、①【0】 ②【1】 ③【2】である。[cite: 9]",
+            blanks: [
+                { answers: ["頭痛", "ずつう"], group: "sancho", label: "三徴1" },
+                { answers: ["嘔吐", "おうと"], group: "sancho", label: "三徴2" },
+                { answers: ["うっ血乳頭", "うっけつにゅうとう"], group: "sancho", label: "三徴3" }
+            ],
+            explanation: "慢性頭蓋内圧亢進の三徴は、①頭痛 ②嘔吐 ③うっ血乳頭 です。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (3)",
+            template: "下行性（【0】）ヘルニアでは、側頭葉内側部が陥入し、【1】神経麻痺による病変側の瞳孔【2】、中脳圧迫による【3】硬直が起こる。[cite: 9]",
+            blanks: [
+                { answers: ["テント切痕", "てんとせっこん"], label: "ヘルニア別名" },
+                { answers: ["動眼", "どうがん"], label: "脳神経" },
+                { answers: ["散大", "さんだい", "拡大"], label: "瞳孔の変化" },
+                { answers: ["除脳", "じょのう"], label: "異常姿勢" }
+            ],
+            explanation: "下行性（テント切痕）ヘルニアでは動眼神経麻痺により病変側の瞳孔散大が起こり、進行すると中脳圧迫により除脳硬直を示します。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (4)",
+            template: "中心性ヘルニアでは【0】呼吸、両側【1】がみられる。大後頭孔（【2】）ヘルニアでは、【3】の圧迫により急激な意識障害・【4】停止が起こる。[cite: 9]",
+            blanks: [
+                { answers: ["チェーンストークス", "ちぇーんすとーくす"], label: "異常呼吸" },
+                { answers: ["縮瞳", "しゅくどう"], label: "瞳孔の変化" },
+                { answers: ["小脳扁桃", "しょうのうへんとう"], label: "陥入組織" },
+                { answers: ["延髄", "えんずい"], label: "圧迫部位" },
+                { answers: ["呼吸", "こきゅう"], label: "生命機能" }
+            ],
+            explanation: "中心性ヘルニアではチェーンストークス呼吸や両側縮瞳がみられます。大後頭孔（小脳扁桃）ヘルニアは延髄の圧迫により急激な呼吸停止を引き起こす最も危険な状態です。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (5)",
+            template: "頭蓋内圧亢進の治療として、【0】術（頭蓋骨片を除去し骨窓を作成）、内減圧術、持続【1】ドレナージがある。看護体位は【2】位（頭部【3】〜【4】度挙上）とする。[cite: 9]",
+            blanks: [
+                { answers: ["外減圧", "そとげんあつ", "がいげんあつ"], label: "手術名" },
+                { answers: ["脳室", "のうしつ"], label: "ドレナージ部位" },
+                { answers: ["セミファーラー", "せみふぁーらー", "セミファウラー"], label: "体位" },
+                { answers: ["20", "２０"], group: "angle", label: "角度下限" },
+                { answers: ["30", "３０"], group: "angle", label: "角度上限" }
+            ],
+            explanation: "治療には外減圧術、内減圧術、持続脳室ドレナージがあります。静脈還流を促進するためセミファーラー位（頭部20〜30度挙上）とします。[cite: 9]"
+        },
+        {
+            section: "第3章：頭蓋内圧亢進症と脳ヘルニア (6)",
+            template: "異常姿勢のアセスメント：【0】硬直は中脳・橋の障害で、四肢が強く伸展し上肢の強い【1】を伴う。【2】硬直は大脳皮質の障害で、上肢は【3】・内転位をとる。[cite: 9]",
+            blanks: [
+                { answers: ["除脳", "じょのう"], label: "異常姿勢名" },
+                { answers: ["回内", "かいない"], label: "上肢の状態" },
+                { answers: ["除皮質", "じょひしつ"], label: "異常姿勢名" },
+                { answers: ["屈曲", "くっきょく"], label: "上肢の状態" }
+            ],
+            explanation: "除脳硬直は中脳・橋上の障害で上肢回内・四肢伸展を伴います。除皮質硬直は大脳皮質の障害で上肢屈曲・下肢伸展となります。[cite: 9]"
+        },
+        {
+            section: "第4章：急性期脳梗塞の治療・看護と意識障害 (1)",
+            template: "血栓溶解療法（【0】静注療法）は、発症から【1】時間以内に投与を開始する。急性期は無理な【2】は行わない。廃用症候群予防として【3】的関節可動域訓練を実施する。[cite: 9]",
+            blanks: [
+                { answers: ["rt-PA", "rt-pa", "アルテプラーゼ", "t-pa"], label: "薬剤名" },
+                { answers: ["4.5", "４．５", "四点五"], label: "制限時間" },
+                { answers: ["降圧", "こうあつ", "血圧を下げること"], label: "血圧管理" },
+                { answers: ["他動", "たどう"], label: "訓練の種類" }
+            ],
+            explanation: "血栓溶解療法（rt-PA静注療法）は発症から4.5時間以内が適応です。虚血を悪化させないため無理な降圧は行わず、廃用予防に他動的関節可動域訓練を行います。[cite: 9]"
+        },
+        {
+            section: "第4章：急性期脳梗塞の治療・看護と意識障害 (2)",
+            template: "【0】は全脳機能の不可逆的停止であり、【1】機能も停止し自発呼吸が【2】。一方、【3】状態は脳幹機能が残存しており、自発呼吸が【4】。[cite: 9]",
+            blanks: [
+                { answers: ["脳死", "のうし"], label: "不可逆的状態" },
+                { answers: ["脳幹", "のうかん"], label: "脳の部位" },
+                { answers: ["なし", "無い", "ない", "不可能"], label: "自発呼吸の有無" },
+                { answers: ["植物", "しょくぶつ", "遷延性意識障害"], label: "遷延する状態" },
+                { answers: ["可能", "かのう", "あり", "出来る"], label: "自発呼吸の可否" }
+            ],
+            explanation: "脳死は脳幹機能も停止し自発呼吸がありません（人工呼吸器が必要）。植物状態（遷延性意識障害）は脳幹機能が残存しており自発呼吸が可能です。[cite: 9]"
+        },
+        {
+            section: "第5章：脳出血とくも膜下出血 (1)",
+            template: "脳出血で最も多いのは【0】出血（40〜50%）。【1】出血（30%）では眼瞼下垂や激しい【2】が特徴。【3】出血は運動失調や回転性めまい、嘔吐がみられる。[cite: 9]",
+            blanks: [
+                { answers: ["被殻", "ひかく"], label: "出血部位" },
+                { answers: ["視床", "ししょう"], label: "出血部位" },
+                { answers: ["視床痛", "ししょうつう", "疼痛"], label: "特徴的な痛み" },
+                { answers: ["小脳", "しょうのう"], label: "出血部位" }
+            ],
+            explanation: "被殻出血（40〜50%）、視床出血（30%）、小脳出血（10〜15%）それぞれの特徴的な症状です。視床出血では視床痛を伴います。[cite: 9]"
+        },
+        {
+            section: "第5章：脳出血とくも膜下出血 (2)",
+            template: "くも膜下出血（SAH）の原因として脳動脈瘤の破裂は40〜60代の【0】に好発し、AVMは20〜40代の【1】に好発する。髄膜刺激症状には【2】、【3】サイン、【4】サインがある。[cite: 9]",
+            blanks: [
+                { answers: ["女性", "じょせい"], label: "性別" },
+                { answers: ["男性", "だんせい"], label: "性別" },
+                { answers: ["頸部硬直", "けいぶこうちょく", "項部硬直"], group: "ziumaku", label: "髄膜刺激症状" },
+                { answers: ["ケルニッヒ", "けるにっひ"], group: "ziumaku", label: "髄膜刺激症状" },
+                { answers: ["ブルジンスキー", "ぶるじんすきー"], group: "ziumaku", label: "髄膜刺激症状" }
+            ],
+            explanation: "脳動脈瘤破裂は40〜60代の女性、脳動静脈奇形（AVM）は20〜40代の男性に好発します。髄膜刺激症状は頸部硬直、ケルニッヒサイン、ブルジンスキーサインです。[cite: 9]"
+        },
+        {
+            section: "第5章：脳出血とくも膜下出血 (3)",
+            template: "SAHの3大合併症と発生時期：①【0】（発症【1】時間以内） ②【2】（発症【3】時間〜【4】週間） ③【5】（発症数週間〜数ヶ月）。[cite: 9]",
+            blanks: [
+                { answers: ["再出血", "さいしゅっけつ"], label: "合併症1" },
+                { answers: ["24", "２４"], label: "時間" },
+                { answers: ["脳血管攣縮", "のうけっかんれんしゅく", "血管攣縮"], label: "合併症2" },
+                { answers: ["72", "７２"], label: "時間" },
+                { answers: ["2", "２", "二"], label: "期間(週)" },
+                { answers: ["正常圧水頭症", "せいじょうあつすいとうしょう", "水頭症"], label: "合併症3" }
+            ],
+            explanation: "①再出血（発症24時間以内）、②脳血管攣縮（発症72時間〜2週間・ピーク8〜10日目）、③正常圧水頭症（発症数週間〜数ヶ月）が3大合併症です。[cite: 9]"
+        },
+        {
+            section: "第6章：脳室ドレナージ・シャント術の看護 (1)",
+            template: "脳室ドレナージの液面が心拍に同期して【0】しているか確認する。設定圧のゼロ点は【1】の高さに合わせる。体位変換時のクランプは【2】側から順に閉鎖する。[cite: 9]",
+            blanks: [
+                { answers: ["拍動", "はくどう"], label: "液面の動き" },
+                { answers: ["外耳孔", "がいじこう", "耳"], label: "基準点" },
+                { answers: ["患者", "かんじゃ"], label: "クランプ順序" }
+            ],
+            explanation: "ドレナージの液面は拍動を確認します。ゼロ点は外耳孔の高さに合わせ、体位変換時のクランプは髄液の過剰流出を防ぐため患者側のクランプから順に閉鎖します。[cite: 9]"
+        },
+        {
+            section: "第6章：脳室ドレナージ・シャント術の看護 (2)",
+            template: "V-Pシャントは脳室から【0】へ髄液を流し、【1】から吸収させる。合併症としてカテーテルのつまりによる【2】や、皮下経路の【3】に注意する。[cite: 9]",
+            blanks: [
+                { answers: ["腹腔", "ふくくう"], label: "流入先" },
+                { answers: ["腹膜", "ふくまく"], label: "吸収部位" },
+                { answers: ["シャント不全", "しゃんとふぜん", "閉塞"], label: "合併症" },
+                { answers: ["感染", "かんせん"], label: "合併症" }
+            ],
+            explanation: "V-Pシャント（脳室-腹腔）で腹腔内へ流入した髄液は腹膜から吸収されます。合併症としてシャント不全や感染に注意が必要です。[cite: 9]"
+        },
+        {
+            section: "第7章：脳血管内治療とその看護 (1)",
+            template: "SAHへの【0】塞栓術、アテローム血栓性梗塞への頸動脈【1】留置術、心原性脳塞栓症への【2】療法がある。[cite: 9]",
+            blanks: [
+                { answers: ["コイル", "こいる"], label: "術式名" },
+                { answers: ["ステント", "すてんと"], label: "術式名" },
+                { answers: ["血栓回収", "けっせんかいしゅう"], label: "術式名" }
+            ],
+            explanation: "くも膜下出血へのコイル塞栓術、アテローム血栓性梗塞への頸動脈ステント留置術、心原性脳塞栓症への血栓回収療法が主な適応です。[cite: 9]"
+        },
+        {
+            section: "第7章：脳血管内治療とその看護 (2)",
+            template: "周術期は穿刺部位の出血予防や血液データ（【0】）の確認を行う。造影剤の副作用観察と尿【1】測定（正常値1.010〜1.030）を実施する。[cite: 9]",
+            blanks: [
+                { answers: ["Hb", "hb", "ヘモグロビン"], label: "血液検査項目" },
+                { answers: ["比重", "ひじゅう"], label: "尿の検査項目" }
+            ],
+            explanation: "穿刺部位からの出血予防および血液データ（Hb）の確認、造影剤使用に伴う副作用の観察と尿比重測定を行います。[cite: 9]"
+        },
+        {
+            section: "第7章：脳血管内治療とその看護 (3)",
+            template: "血管内治療時の疼痛や緊張によって引き起こされる【0】反射（【1】・【2】）の早期発見に努める。[cite: 9]",
+            blanks: [
+                { answers: ["迷走神経", "めいそうしんけい", "血管迷走神経"], label: "反射の名称" },
+                { answers: ["徐脈", "じょみゃく"], group: "hansya", label: "バイタル変化" },
+                { answers: ["血圧低下", "けつあつていか", "低血圧"], group: "hansya", label: "バイタル変化" }
+            ],
+            explanation: "疼痛や緊張による迷走神経反射（徐脈・血圧低下）の早期発見が周術期看護のポイントです。[cite: 9]"
+        }
+    ];
+
+    let currentQIndex = 0;
+
+    window.onload = function() {
+        renderQuestion();
+    };
+
+    function renderQuestion() {
+        const q = quizData[currentQIndex];
+        document.getElementById('section-title').textContent = q.section;
+        
+        // プログレスバー
+        const progressPercent = ((currentQIndex + 1) / quizData.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        document.getElementById('progress-text').textContent = `問題 ${currentQIndex + 1} / ${quizData.length}`;
+
+        // 問題文の生成
+        let htmlContent = q.template;
+        q.blanks.forEach((blank, idx) => {
+            const inputHtml = `<input type="text" class="blank-input" id="input-${idx}" placeholder="${blank.label}" autocomplete="off" data-group="${blank.group || ''}">`;
+            htmlContent = htmlContent.replace(`【${idx}】`, inputHtml);
+        });
+
+        document.getElementById('question-box').innerHTML = htmlContent;
+
+        // UIリセット
+        document.getElementById('submit-btn').style.display = 'block';
+        document.getElementById('feedback-box').classList.remove('show');
+        document.getElementById('ans-details').innerHTML = '';
+
+        // イベントリスナー
+        setTimeout(() => {
+            const firstInput = document.getElementById('input-0');
+            if (firstInput) firstInput.focus();
+        }, 100);
+
+        q.blanks.forEach((_, idx) => {
+            const input = document.getElementById(`input-${idx}`);
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const nextInput = document.getElementById(`input-${idx + 1}`);
+                    if (nextInput) {
+                        nextInput.focus();
+                    } else {
+                        checkAnswers();
+                    }
+                }
+            });
+        });
+    }
+
+    function checkAnswers() {
+        const q = quizData[currentQIndex];
+        let correctCount = 0;
+        const detailsList = document.getElementById('ans-details');
+        detailsList.innerHTML = '';
+
+        // グループごとの整理
+        const groups = {};
+        const independentBlanks = [];
+
+        q.blanks.forEach((blank, idx) => {
+            if (blank.group) {
+                if (!groups[blank.group]) groups[blank.group] = [];
+                groups[blank.group].push({ blank, idx });
+            } else {
+                independentBlanks.push({ blank, idx });
+            }
+        });
+
+        // 独立した空欄の判定
+        independentBlanks.forEach(item => {
+            const inputEl = document.getElementById(`input-${item.idx}`);
+            const userVal = inputEl.value.trim().toLowerCase();
+            const isCorrect = item.blank.answers.some(ans => ans.toLowerCase() === userVal);
+            
+            inputEl.disabled = true;
+
+            const li = document.createElement('li');
+            li.className = isCorrect ? 'ans-item item-ok' : 'ans-item item-ng';
+            
+            if (isCorrect) {
+                inputEl.classList.add('correct');
+                correctCount++;
+                li.innerHTML = `<span class="status-ok">✔ 正解</span> (入力: ${userVal || '空欄'})`;
+            } else {
+                inputEl.classList.add('incorrect');
+                li.innerHTML = `<span class="status-ng">✖ 不正解</span> (入力: ${userVal || '空欄'} / 正答例: ${item.blank.answers[0]})`;
+            }
+            detailsList.appendChild(li);
+        });
+
+        // 順不同グループの判定
+        for (const groupName in groups) {
+            const groupItems = groups[groupName];
+            // 判定用に正解のプールを作る (配列の配列)
+            let answerPool = groupItems.map(item => item.blank.answers);
+
+            groupItems.forEach(item => {
+                const inputEl = document.getElementById(`input-${item.idx}`);
+                const userVal = inputEl.value.trim().toLowerCase();
+                inputEl.disabled = true;
+
+                let matchedPoolIndex = -1;
+                for (let i = 0; i < answerPool.length; i++) {
+                    if (answerPool[i] && answerPool[i].some(ans => ans.toLowerCase() === userVal)) {
+                        matchedPoolIndex = i;
+                        break;
+                    }
+                }
+
+                const li = document.createElement('li');
+                
+                if (matchedPoolIndex !== -1) {
+                    inputEl.classList.add('correct');
+                    correctCount++;
+                    answerPool[matchedPoolIndex] = null; // 使った正解をプールから消す
+                    li.className = 'ans-item item-ok';
+                    li.innerHTML = `<span class="status-ok">✔ 正解 [順不同]</span> (入力: ${userVal})`;
+                } else {
+                    inputEl.classList.add('incorrect');
+                    li.className = 'ans-item item-ng';
+                    // プールに残っている最初の正解候補を提示
+                    const remainingAns = answerPool.find(arr => arr !== null);
+                    const suggestedAns = remainingAns ? remainingAns[0] : groupItems[0].blank.answers[0];
+                    li.innerHTML = `<span class="status-ng">✖ 不正解 [順不同]</span> (入力: ${userVal || '空欄'} / 正答例: ${suggestedAns})`;
+                }
+                detailsList.appendChild(li);
+            });
+        }
+
+        // 結果表示UI
+        document.getElementById('submit-btn').style.display = 'none';
+        
+        const feedbackTitle = document.getElementById('feedback-title');
+        if (correctCount === q.blanks.length) {
+            feedbackTitle.textContent = "🎉 全問正解！";
+            feedbackTitle.style.color = "var(--success-color)";
+        } else {
+            feedbackTitle.textContent = `⚠️ ${q.blanks.length}箇所中 ${correctCount}箇所正解`;
+            feedbackTitle.style.color = "var(--error-color)";
+        }
+
+        document.getElementById('explanation-text').innerHTML = `<strong>【解説・出典】</strong><br>${q.explanation}`;
+        document.getElementById('feedback-box').classList.add('show');
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        if (currentQIndex < quizData.length) {
+            renderQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        
+        document.getElementById('final-score').textContent = `修了！`;
+        document.getElementById('score-comment').textContent = "すべての問題の演習が完了しました。講義資料の太字部分や重要語句の網羅的な復習ができています。";
+    }
+</script>
+
+</body>
+</html>

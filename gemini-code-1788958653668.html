@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>救命救急治療 徹底網羅 穴埋め演習</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --success-color: #27ae60;
+            --error-color: #c0392b;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 12px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .instruction {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            border-left: 5px solid #ffeeba;
+        }
+
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            background-color: #e9ecef;
+            height: 12px;
+            border-radius: 6px;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: #fceae8;
+            padding: 10px 15px;
+            border-left: 5px solid var(--secondary-color);
+            border-radius: 4px;
+            margin-bottom: 25px;
+        }
+
+        .question-box {
+            font-size: 1.15rem;
+            line-height: 2.2;
+            margin-bottom: 30px;
+            background-color: #fafafa;
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .question-box ul {
+            margin-top: 0;
+            padding-left: 20px;
+        }
+
+        .question-box li {
+            margin-bottom: 10px;
+        }
+
+        .blank-input {
+            display: inline-block;
+            width: 140px;
+            padding: 8px 12px;
+            font-size: 1.05rem;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            text-align: center;
+            margin: 0 4px;
+            transition: all 0.3s;
+            background-color: #fff;
+        }
+
+        .blank-input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.4);
+        }
+
+        .blank-input.correct {
+            border-color: var(--success-color);
+            background-color: #e8f8f0;
+            color: #1e7e34;
+            font-weight: bold;
+        }
+
+        .blank-input.incorrect {
+            border-color: var(--error-color);
+            background-color: #fdf2f2;
+            color: #bd2130;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-next {
+            background-color: var(--success-color);
+            margin-top: 20px;
+        }
+
+        .btn-next:hover {
+            background-color: #219150;
+        }
+
+        .feedback-box {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            display: none;
+        }
+
+        .feedback-box.show {
+            display: block;
+            animation: fadeIn 0.4s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .ans-list {
+            margin-top: 15px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .ans-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 4px;
+            border-left: 4px solid #ccc;
+            font-size: 1.05rem;
+        }
+
+        .ans-item.item-ok { border-left-color: var(--success-color); }
+        .ans-item.item-ng { border-left-color: var(--error-color); }
+
+        .status-ok { color: var(--success-color); font-weight: bold; margin-right: 10px; }
+        .status-ng { color: var(--error-color); font-weight: bold; margin-right: 10px; }
+
+        .explanation {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px dashed #ccc;
+            font-size: 1rem;
+            color: #444;
+            line-height: 1.7;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 30px 0;
+        }
+
+        .citation {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>救命救急治療 徹底網羅 穴埋め演習</h1>
+    
+    <div id="quiz-screen">
+        <div class="instruction">
+            💡 <strong>ヒント:</strong> 複数の空欄が並んでいる箇所やリストの項目は、<strong>どの順番で解答しても正解</strong>になるよう設計されています。
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-text" id="progress-text">問題 1 / 16</div>
+        </div>
+
+        <div class="section-title" id="section-title"></div>
+        
+        <div class="question-box" id="question-box">
+            <!-- JavaScriptが問題をここに挿入します -->
+        </div>
+
+        <button class="btn" id="submit-btn" onclick="checkAnswers()">判定する</button>
+
+        <div class="feedback-box" id="feedback-box">
+            <h2 id="feedback-title" style="margin-top:0;"></h2>
+            <ul id="ans-details" class="ans-list"></ul>
+            <div id="explanation-text" class="explanation"></div>
+            <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+        </div>
+    </div>
+
+    <div id="result-screen">
+        <h2>全問演習完了！</h2>
+        <p>資料内の全領域の復習が完了しました。</p>
+        <div class="score-display" id="final-score"></div>
+        <p id="score-comment" style="font-size: 1.2rem; margin-bottom: 40px;"></p>
+        <button class="btn" onclick="location.reload()">最初からやり直す</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            section: "第1章:救急看護の理念・特徴・実践の4つの柱 (1)",
+            template: `<ul>
+                <li>救急医療の対象となる救急患者は、年齢・性別・疾患の内容・外傷の種類・重症度を問わない。<span class="citation">[cite: 10]</span></li>
+                <li>日本救急看護学会によると、救急看護とは迅速かつ適切な看護実践であり、緊急度・重症度の判断を通じて「【0】」ことを目的とする。<span class="citation">[cite: 10]</span></li>
+                <li>救急状況における判断の軸として、時間的緊急性を示す「【1】」と、生命の危険度を示す「【2】」の2つがある。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["命を救い・生を支える", "命を救い生を支える", "命を救い、生を支える"], label: "目的" },
+                { answers: ["緊急度", "きんきゅうど"], label: "時間的緊急性" },
+                { answers: ["重症度", "じゅうしょうど"], label: "生命の危険度" }
+            ],
+            explanation: "救急看護は迅速かつ適切な看護実践により、「命を救い・生を支える」ことを目的とします。判断の軸には「緊急度」と「重症度」があります。[cite: 10]"
+        },
+        {
+            section: "第1章:救急看護の理念・特徴・実践の4つの柱 (2)",
+            template: `<ul>
+                <li>救急看護の実践概要における「救急看護実践」の4つの柱は、【0】、【1】、【2】、【3】である。<span class="citation">[cite: 10]</span></li>
+                <li>救急看護の役割体制は、1.救急看護実践、2.【4】、3.【5】の3つから構成される。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["救急処置・介助", "救急処置介助", "救急処置", "介助"], group: "hashira", label: "実践の柱" },
+                { answers: ["精神的ケア", "せいしんてきけあ"], group: "hashira", label: "実践の柱" },
+                { answers: ["生活行動援助", "せいかつこうどうえんじょ"], group: "hashira", label: "実践の柱" },
+                { answers: ["社会的支援", "しゃかいてきしえん"], group: "hashira", label: "実践の柱" },
+                { answers: ["調整・管理", "調整管理", "調整", "管理"], group: "yakuwari", label: "役割体制" },
+                { answers: ["教育・研究・政策", "教育研究政策", "教育", "研究", "政策"], group: "yakuwari", label: "役割体制" }
+            ],
+            explanation: "4つの柱は「救急処置・介助」「精神的ケア」「生活行動援助」「社会的支援」です。役割体制は「救急看護実践」「調整・管理」「教育・研究・政策」から構成されます。[cite: 10]"
+        },
+        {
+            section: "第2章:臨床推論のプロセス・4パターン・Snap Diagnosis (1)",
+            template: `<ul>
+                <li>広義の臨床推論とは、「【0】が特定の状況下で、最良の判断に基づく行動を起こすことを可能にするための【1】」と定義される。<span class="citation">[cite: 10]</span></li>
+                <li>看護師が臨床推論を学ぶことで、【2】の向上、重症度・緊急度の高精度な判断、【3】や急変察知への活用が期待できる。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["臨床医", "りんしょうい", "医師"], label: "主体" },
+                { answers: ["思考プロセス", "しこうぷろせす", "思考過程"], label: "定義" },
+                { answers: ["患者ケアの質", "ケアの質", "かんじゃけあのしつ"], label: "向上が期待されるもの" },
+                { answers: ["トリアージ", "とりあーじ"], label: "活用場面" }
+            ],
+            explanation: "臨床推論は最良の判断に基づく行動を可能にする「思考プロセス」であり、看護師が学ぶことで「患者ケアの質」の向上や「トリアージ」への活用が期待できます。[cite: 10]"
+        },
+        {
+            section: "第2章:臨床推論のプロセス・4パターン・Snap Diagnosis (2)",
+            template: `<ul>
+                <li>臨床推論の 4 つのパターンは、①【0】、②【1】、③【2】、④徹底的検討法である。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["パターン認識", "ぱたーんにんしき"], group: "pattern", label: "推論パターン" },
+                { answers: ["仮説演繹法", "かせつえんえきほう"], group: "pattern", label: "推論パターン" },
+                { answers: ["診断基準/アルゴリズム", "診断基準", "アルゴリズム", "しんだんきじゅん"], group: "pattern", label: "推論パターン" }
+            ],
+            explanation: "臨床推論の4パターンは、「パターン認識」「仮説演繹法」「診断基準/アルゴリズム」「徹底的検討法」です。[cite: 10]"
+        },
+        {
+            section: "第2章:臨床推論のプロセス・4パターン・Snap Diagnosis (3)",
+            template: `<ul>
+                <li>徴候の組み合わせにより一気に鑑別診断の幅を狭くする（【0】）の具体例：<span class="citation">[cite: 10]</span></li>
+                <li>甲状腺腫 ＋ 眼球突出 ＋ 頻脈 ＝ （【1】）<span class="citation">[cite: 10]</span></li>
+                <li>狭心痛 ＋ 呼吸苦 ＋ 失神 ＝ （【2】）<span class="citation">[cite: 10]</span></li>
+                <li>月経異常 ＋ 肥満 ＋ 男性型脱毛 ＝ （【3】）<span class="citation">[cite: 10]</span></li>
+                <li>回転性めまい ＋ 嘔吐 ＋ 耳鳴 ＝ （【4】）<span class="citation">[cite: 10]</span></li>
+                <li>易疲労感 ＋ 筋力低下 ＋ 筋痙攣 ＝ （【5】）<span class="citation">[cite: 10]</span></li>
+                <li>パターン認識を単なるヤマ勘に終わらせないためには、自分の直感を（【6】）することが重要である。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["スナップダイアグノーシス", "snap diagnosis", "すなっぷだいあぐのーしす"], label: "推論手法" },
+                { answers: ["バセドウ病", "ばせどうびょう", "バセドウ"], label: "疾患名" },
+                { answers: ["大動脈弁狭窄症", "だいどうみゃくべんきょうさくしょう", "AS"], label: "疾患名" },
+                { answers: ["多嚢胞性卵巣症候群", "たのうほうせいらんそうしょうこうぐん", "PCOS"], label: "疾患名" },
+                { answers: ["メニエール病", "めにえーるびょう", "メニエール"], label: "疾患名" },
+                { answers: ["低カリウム血症", "ていかりうむけっしょう"], label: "病態名" },
+                { answers: ["言語化", "げんごか"], label: "重要なプロセス" }
+            ],
+            explanation: "これらは「スナップダイアグノーシス」の典型例です。ヤマ勘で終わらせないためには、直感を「言語化」して説明できるようにすることが重要です。[cite: 10]"
+        },
+        {
+            section: "第 3 章：仮説演繹法と臨床推論のケーススタディ",
+            template: `<ul>
+                <li>仮説演繹法では、最初の情報から考えられる疾患や状態を想起する「【0】」を行い、問題表象に対して（【1】）個の鑑別診断セットを立て、症状や所見を探し出して検証する。<span class="citation">[cite: 10]</span></li>
+                <li>【Case 1】62 歳男性。食後に階段を上る途中で胸の裏側が締め付けられる感覚、呼吸苦などが発現し、立ち止まると改善した。これは（【2】）などの虚血性心疾患が疑われる。<span class="citation">[cite: 10]</span></li>
+                <li>【Case 2】78 歳女性。既往に糖尿病、高血圧、心房細動などがある。夕食後トイレから戻った際、胸の重苦しさと共に（【3】）が出現した。<span class="citation">[cite: 10]</span></li>
+                <li>急変事例などを習慣的に、その背景や疑問点について考えることが、臨床推論に着目する（【4】）である。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["仮説形成", "かせつけいせい"], label: "最初のステップ" },
+                { answers: ["3〜5", "3~5", "３〜５", "3から5"], label: "鑑別診断の数" },
+                { answers: ["労作性狭心症", "ろうさせいきょうしんしょう", "狭心症"], label: "疾患名" },
+                { answers: ["脂汗", "あぶらあせ", "冷汗"], label: "随伴症状" },
+                { answers: ["1つの近道", "ひとつのちかみち", "一つの近道", "近道"], label: "学習の姿勢" }
+            ],
+            explanation: "仮説演繹法では「仮説形成」を行い、3〜5個の鑑別診断セットを立てます。労作で出現し安静で改善するのは「労作性狭心症」の特徴です。日頃から疑問をもつことが臨床推論上達の「1つの近道」となります。[cite: 10]"
+        },
+        {
+            section: "第 4 章：救急医療体制・メディカルコントロール・病院前救護 (1)",
+            template: `<ul>
+                <li>救急医療体制において、入院や手術を要する医療を行うのは（【0】）救急であり、命に関わる重症・高度医療を担当するのは（【1】）救急である。<span class="citation">[cite: 10]</span></li>
+                <li>救急現場から搬送される間に救急救命士が行う医行為の質を医師が指示・指導・検証して保障する仕組みを（【2】）と呼ぶ。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["二次", "2次", "にじ"], label: "救急体制" },
+                { answers: ["三次", "3次", "さんじ"], label: "救急体制" },
+                { answers: ["メディカルコントロール", "めでぃかるこんとろーる", "MC"], label: "保障の仕組み" }
+            ],
+            explanation: "入院・手術を要するのは「二次救急」、重症・高度医療は「三次救急」です。病院前救護の質を医師が保障する仕組みを「メディカルコントロール」と呼びます。[cite: 10]"
+        },
+        {
+            section: "第 4 章：救急医療体制・メディカルコントロール・病院前救護 (2)",
+            template: `<ul>
+                <li>救急隊から医療機関への病院連絡方法（MIST）の構成要素：<span class="citation">[cite: 10]</span></li>
+                <li>M：（【0】）<span class="citation">[cite: 10]</span></li>
+                <li>I：（【1】）<span class="citation">[cite: 10]</span></li>
+                <li>S：（【2】）<span class="citation">[cite: 10]</span></li>
+                <li>T：（【3】）<span class="citation">[cite: 10]</span></li>
+                <li>プレホスピタルから病院までの標準化教育:<span class="citation">[cite: 10]</span></li>
+                <li>JPTEC:救急隊による現場・車中で必要な(【4】)<span class="citation">[cite: 10]</span></li>
+                <li>JNTEC:看護師向けの診断を導く観察技法、治療に必要な(【5】)、診療で生じる患者への不利益の予防・緩和方法<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["受傷機転", "Mechanism of Injury", "じゅしょうきてん"], label: "M" },
+                { answers: ["受傷部位", "Injury site", "じゅしょうぶい"], label: "I" },
+                { answers: ["徴候", "Signs", "ちょうこう"], label: "S" },
+                { answers: ["病院前救護処置", "Treatment", "処置", "びょういんまえきゅうごしょち"], label: "T" },
+                { answers: ["観察技法", "かんさつぎほう"], label: "JPTECの内容" },
+                { answers: ["介助方法", "かいじょほうほう"], label: "JNTECの内容" }
+            ],
+            explanation: "MISTはMechanism of Injury(受傷機転)、Injury site(受傷部位)、Signs(徴候)、Treatment(病院前救護処置)の頭文字です。JPTECは観察技法、JNTECは看護師向けの観察技法と介助方法を学びます。[cite: 10]"
+        },
+        {
+            section: "第5章:外傷初期診療・ロード&ゴー・高エネルギー事故 (1)",
+            template: `<ul>
+                <li>外傷初期治療における最大目標は「PTD (【0】)」の撲滅である。<span class="citation">[cite: 10]</span></li>
+                <li>重症傷病者の受傷後1時間を(【1】)、救急隊の現場活動時間の目標となる受傷後10分を(【2】)と呼ぶ。<span class="citation">[cite: 10]</span></li>
+                <li>医療機関では到着から手術開始まで(【3】) 分以内を目標とする。<span class="citation">[cite: 10]</span></li>
+                <li>生命維持に関係のない部位の観察・処置を省略し、一刻も早く外傷専門医療機関へ搬送する概念を(【4】) という。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["防ぎえた死", "ふせぎえたし", "Preventable Trauma Death"], label: "PTD" },
+                { answers: ["ゴールデンアワー", "ごーるでんあわー"], label: "受傷後1時間" },
+                { answers: ["プラチナタイム", "ぷらちなたいむ"], label: "受傷後10分" },
+                { answers: ["30", "３０", "三十"], label: "時間(分)" },
+                { answers: ["ロード&ゴー", "ロードアンドゴー", "load & go", "ろーどあんどごー"], label: "搬送概念" }
+            ],
+            explanation: "外傷の最大目標は「防ぎえた死(PTD)」の撲滅です。受傷後1時間をゴールデンアワー、現場活動の10分をプラチナタイム、病院での手術開始までを30分以内とし、「ロード&ゴー」の概念で迅速に搬送します。[cite: 10]"
+        },
+        {
+            section: "第5章:外傷初期診療・ロード&ゴー・高エネルギー事故 (2)",
+            template: `<ul>
+                <li>高エネルギー事故の該当基準(受傷機転):<span class="citation">[cite: 10]</span></li>
+                <li>高所墜落:(【0】) m以上 (または3階以上)。※小児は身長の (【1】)倍の高さ。<span class="citation">[cite: 10]</span></li>
+                <li>バイク事故：運転者が離れていた、もしくは（【2】）km/h 以上。<span class="citation">[cite: 10]</span></li>
+                <li>車両事故：跳ね飛ばされた（5m 以上または 30km/h）、車の横転、車外放出、救出に（【3】）分以上要した等。<span class="citation">[cite: 10]</span></li>
+                <li>外傷診療の Pitfall（落とし穴）：派手な外傷に目を奪われ目立つ損傷から診察を始めると、患者を（【4】）に陥らせる危険がある。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["6", "６", "六"], label: "高さ(m)" },
+                { answers: ["2~3", "2〜3", "２〜３", "2から3", "2-3"], label: "身長の倍数" },
+                { answers: ["30", "３０"], label: "速度(km/h)" },
+                { answers: ["20", "２０"], label: "時間(分)" },
+                { answers: ["ショック", "shock", "しょっく"], label: "陥る危険な状態" }
+            ],
+            explanation: "高エネルギー事故の基準は、高所墜落6m以上（小児は身長の2~3倍）、バイク30km/h以上、救出に20分以上などです。派手な外傷に気を取られると「ショック」を見落とす危険があります。[cite: 10]"
+        },
+        {
+            section: "第 6 章：Primary Survey（ABCDE）と致命的胸部外傷 (1)",
+            template: `<ul>
+                <li>初期の評価（Primary Survey）は概ね（【0】）秒以内で全体像を把握し、致命的な障害を直ちに治療する。<span class="citation">[cite: 10]</span></li>
+                <li>Primary Survey の評価項目：<span class="citation">[cite: 10]</span></li>
+                <li>A：（【1】）<span class="citation">[cite: 10]</span></li>
+                <li>B：（【2】）<span class="citation">[cite: 10]</span></li>
+                <li>C：（【3】）<span class="citation">[cite: 10]</span></li>
+                <li>D：（【4】）<span class="citation">[cite: 10]</span></li>
+                <li>E：（【5】）<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["15", "１５"], label: "秒数" },
+                { answers: ["気道", "きどう", "Airway"], label: "A" },
+                { answers: ["呼吸", "こきゅう", "Breathing"], label: "B" },
+                { answers: ["循環", "じゅんかん", "Circulation"], label: "C" },
+                { answers: ["中枢神経障害", "ちゅうすうしんけいしょうがい", "Dysfunction of CNS", "神経"], label: "D" },
+                { answers: ["脱衣と体温管理", "だついとたいおんかんり", "Exposure & Environmental control", "脱衣", "体温管理"], label: "E" }
+            ],
+            explanation: "Primary Surveyは15秒以内で全体像を把握します。ABCDEは、気道(A)、呼吸(B)、循環(C)、中枢神経障害(D)、脱衣と体温管理(E)を指します。[cite: 10]"
+        },
+        {
+            section: "第 6 章：Primary Survey（ABCDE）と致命的胸部外傷 (2)",
+            template: `<ul>
+                <li>A(気道)での酸素投与は、(【0】) L/分 リザーバー付マスクを使用する。<span class="citation">[cite: 10]</span></li>
+                <li>Primary Survey で同定すべき「致命的胸部外傷」: 気道閉塞、心タンポナーデ、開放性気胸の他、【1】、【2】、動揺胸を伴う【3】。<span class="citation">[cite: 10]</span></li>
+                <li>C(循環)評価での静脈路確保では、加温した乳酸リンゲル液を (【4】) ml~ (【5】)ml急速投与する(静脈路は2ルート)。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["10", "１０"], label: "酸素流量" },
+                { answers: ["緊張性気胸", "きんちょうせいききょう"], group: "kyobu", label: "致命的胸部外傷" },
+                { answers: ["大量血胸", "たいりょうけっきょう"], group: "kyobu", label: "致命的胸部外傷" },
+                { answers: ["フレイルチェスト", "ふれいるちぇすと"], group: "kyobu", label: "致命的胸部外傷" },
+                { answers: ["1000", "１０００", "千"], label: "輸液量下限" },
+                { answers: ["2000", "２０００", "二千"], label: "輸液量上限" }
+            ],
+            explanation: "酸素は10L/分で投与します。致命的胸部外傷には、緊張性気胸、大量血胸、フレイルチェストなどが含まれます。初期輸液は加温乳酸リンゲル液を1000〜2000ml急速投与します。[cite: 10]"
+        },
+        {
+            section: "第7章:ショックの5徴候・分類・外傷の致死的三徵 (1)",
+            template: `<ul>
+                <li>ショックの5徴候 (ショックの5Ps):<span class="citation">[cite: 10]</span></li>
+                <li>1. 蒼白(Pallor)<span class="citation">[cite: 10]</span></li>
+                <li>2. (【0】) (Prostration)<span class="citation">[cite: 10]</span></li>
+                <li>3. (【1】) (Perspiration)<span class="citation">[cite: 10]</span></li>
+                <li>4. 脈拍触知不能または微弱な速脈 (Pulselessness)<span class="citation">[cite: 10]</span></li>
+                <li>5. (【2】) (Pulmonary insufficiency)<span class="citation">[cite: 10]</span></li>
+                <li>ショックの4分類:<span class="citation">[cite: 10]</span></li>
+                <li>出血や体液喪失による: (【3】) ショック<span class="citation">[cite: 10]</span></li>
+                <li>心筋梗塞等による: 心原性ショック<span class="citation">[cite: 10]</span></li>
+                <li>心タンポナーデや緊張性気胸等による: (【4】) ショック<span class="citation">[cite: 10]</span></li>
+                <li>アナフィラキシーや敗血症、脊髄損傷による: (【5】) ショック<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["無気力/虚脱", "無気力", "虚脱", "むきりょく", "きょだつ"], label: "5Ps (P)" },
+                { answers: ["冷汗", "ひやあせ"], label: "5Ps (P)" },
+                { answers: ["呼吸不全", "こきゅうふぜん"], label: "5Ps (P)" },
+                { answers: ["循環血液量減少性", "じゅんかんけつえきりょうげんしょうせい", "循環血液量減少"], label: "ショック分類" },
+                { answers: ["心外閉塞・拘束性", "心外閉塞拘束性", "しんがいへいそくこうそくせい"], label: "ショック分類" },
+                { answers: ["血液分布異常性", "けつえきぶんぷいじょうせい", "血液分布異常"], label: "ショック分類" }
+            ],
+            explanation: "ショックの5Pは、Pallor(蒼白), Prostration(無気力/虚脱), Perspiration(冷汗), Pulselessness(脈拍触知不能), Pulmonary insufficiency(呼吸不全)です。[cite: 10]"
+        },
+        {
+            section: "第7章:ショックの5徴候・分類・外傷の致死的三徵 (2)",
+            template: `<ul>
+                <li>ショック指数 (SI) の計算式は(【0】)であり、正常値は0.54±0.07である。SIが1.0の場合の推定出血量は約 (【1】) Lである。<span class="citation">[cite: 10]</span></li>
+                <li>体温が (【2】) ℃以下になると酸素消費量が著しく増加する。<span class="citation">[cite: 10]</span></li>
+                <li>外傷の致死的三徵とは、(【3】)、(【4】)、(【5】)である。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["心拍数 / 収縮期血圧", "心拍数/収縮期血圧", "心拍数÷収縮期血圧", "しんぱくすう/しゅうしゅくきけつあつ"], label: "SI計算式" },
+                { answers: ["1", "１", "一"], label: "出血量(L)" },
+                { answers: ["35", "３５"], label: "体温" },
+                { answers: ["低体温", "ていたいおん"], group: "sanshou", label: "致死的三徴" },
+                { answers: ["凝固障害", "ぎょうこしょうがい"], group: "sanshou", label: "致死的三徴" },
+                { answers: ["代謝性アシドーシス", "たいしゃせいあしどーしす"], group: "sanshou", label: "致死的三徴" }
+            ],
+            explanation: "ショック指数は「心拍数 / 収縮期血圧」です。外傷の致死的三徴は「低体温」「凝固障害」「代謝性アシドーシス」であり、これが揃うと救命が極めて困難になります。[cite: 10]"
+        },
+        {
+            section: "第8章:Secondary Survey と事例 (Case 1) の経過",
+            template: `<ul>
+                <li>Secondary Survey (全身評価)に入った後も、患者の状態に変化があった場合は必ず (【0】)に戻る。<span class="citation">[cite: 10]</span></li>
+                <li>見落としチェックの合い言葉 「FIXES」の「F」 は (【1】)を指す。<span class="citation">[cite: 10]</span></li>
+                <li>【事例 Case1】55歳男性、乗用車で水田へ (【2】) m落下の事故。<span class="citation">[cite: 10]</span></li>
+                <li>病院到着時D(神経学): GCS は E (【3】) V (【4】) M(【5】)=3点。<span class="citation">[cite: 10]</span></li>
+                <li>到着 5 分後に（【6】）へ移動、45 分後には JCS が（【7】）へ改善した。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["Primary Survey", "ぷらいまりーさーべい", "プライマリーサーベイ", "初期評価"], label: "戻るべき評価" },
+                { answers: ["Full tube", "ふるちゅーぶ", "すべての腔,管・留置カテーテル等の確認"], label: "FIXESのF" },
+                { answers: ["3", "３"], label: "落下距離" },
+                { answers: ["1", "１"], label: "E" },
+                { answers: ["1", "１"], label: "V" },
+                { answers: ["1", "１"], label: "M" },
+                { answers: ["CT室", "CT", "しーてぃーしつ"], label: "移動先" },
+                { answers: ["I-3〜II-10", "1-3~2-10", "I-3~II-10", "I-3からII-10"], label: "JCS改善値" }
+            ],
+            explanation: "状態変化時は必ず「Primary Survey」に戻ります。FIXESのFは「Full tube」です。GCS E1V1M1は最重症の3点ですが、適切な処置とCT室への迅速な移動により意識レベルの改善がみられました。[cite: 10]"
+        },
+        {
+            section: "第 9 章：家族システムの特性・危機モデル・救急看護の特長",
+            template: `<ul>
+                <li>家族外来対応では、患者や家族への対応が「緊急度・重症度の高さに（【0】）していない」点に注意する。<span class="citation">[cite: 10]</span></li>
+                <li>家族システムの 5 つの特性： 1.（【1】）、 2.（【2】）、 3.（【3】）、 4.（【4】）、 5.（【5】）。<span class="citation">[cite: 10]</span></li>
+                <li>危機的状況下の家族アセスメントモデル（フィンクの危機モデル）の 4 段階： 1.（【6】） → 2.（【7】） → 3.承認 → 4.適応<span class="citation">[cite: 10]</span></li>
+                <li>救急看護の特徴として、信頼関係が確立されていないことが多く、患者の権利を守る（【8】）としての役割が大きい。<span class="citation">[cite: 10]</span></li>
+            </ul>`,
+            blanks: [
+                { answers: ["比例", "ひれい"], label: "対応の注意点" },
+                { answers: ["全体性", "ぜんたいせい"], group: "kazoku", label: "特性" },
+                { answers: ["非累積性", "ひるいせきせい"], group: "kazoku", label: "特性" },
+                { answers: ["恒常性", "こうじょうせい"], group: "kazoku", label: "特性" },
+                { answers: ["循環的因果関係", "じゅんかんてきいんがかんけい"], group: "kazoku", label: "特性" },
+                { answers: ["組織性", "そしきせい"], group: "kazoku", label: "特性" },
+                { answers: ["衝撃", "ショック", "しょうげき", "しょっく"], label: "危機モデル第1段階" },
+                { answers: ["防衛的退行", "ぼうえいてきたいこう"], label: "危機モデル第2段階" },
+                { answers: ["アドボケーター", "あどぼけーたー", "代弁者"], label: "看護師の役割" }
+            ],
+            explanation: "家族システムの特性には全体性、非累積性、恒常性、循環的因果関係、組織性があります。フィンクの危機モデルは「衝撃」→「防衛的退行」→「承認」→「適応」と進みます。救急領域では「アドボケーター（権利擁護者）」としての役割が重要です。[cite: 10]"
+        }
+    ];
+
+    let currentQIndex = 0;
+
+    window.onload = function() {
+        renderQuestion();
+    };
+
+    function renderQuestion() {
+        const q = quizData[currentQIndex];
+        document.getElementById('section-title').textContent = q.section;
+        
+        // プログレスバー
+        const progressPercent = ((currentQIndex + 1) / quizData.length) * 100;
+        document.getElementById('progress-bar').style.width = progressPercent + '%';
+        document.getElementById('progress-text').textContent = `問題 ${currentQIndex + 1} / ${quizData.length}`;
+
+        // 問題文の生成
+        let htmlContent = q.template;
+        q.blanks.forEach((blank, idx) => {
+            const inputHtml = `<input type="text" class="blank-input" id="input-${idx}" placeholder="${blank.label}" autocomplete="off" data-group="${blank.group || ''}">`;
+            htmlContent = htmlContent.replace(`【${idx}】`, inputHtml);
+        });
+
+        document.getElementById('question-box').innerHTML = htmlContent;
+
+        // UIリセット
+        document.getElementById('submit-btn').style.display = 'block';
+        document.getElementById('feedback-box').classList.remove('show');
+        document.getElementById('ans-details').innerHTML = '';
+
+        // イベントリスナー
+        setTimeout(() => {
+            const firstInput = document.getElementById('input-0');
+            if (firstInput) firstInput.focus();
+        }, 100);
+
+        q.blanks.forEach((_, idx) => {
+            const input = document.getElementById(`input-${idx}`);
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const nextInput = document.getElementById(`input-${idx + 1}`);
+                        if (nextInput) {
+                            nextInput.focus();
+                        } else {
+                            checkAnswers();
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function checkAnswers() {
+        const q = quizData[currentQIndex];
+        let correctCount = 0;
+        const detailsList = document.getElementById('ans-details');
+        detailsList.innerHTML = '';
+
+        // グループごとの整理
+        const groups = {};
+        const independentBlanks = [];
+
+        q.blanks.forEach((blank, idx) => {
+            if (blank.group) {
+                if (!groups[blank.group]) groups[blank.group] = [];
+                groups[blank.group].push({ blank, idx });
+            } else {
+                independentBlanks.push({ blank, idx });
+            }
+        });
+
+        // 独立した空欄の判定
+        independentBlanks.forEach(item => {
+            const inputEl = document.getElementById(`input-${item.idx}`);
+            const userVal = inputEl.value.trim().toLowerCase();
+            const isCorrect = item.blank.answers.some(ans => ans.toLowerCase() === userVal);
+            
+            inputEl.disabled = true;
+
+            const li = document.createElement('li');
+            li.className = isCorrect ? 'ans-item item-ok' : 'ans-item item-ng';
+            
+            if (isCorrect) {
+                inputEl.classList.add('correct');
+                correctCount++;
+                li.innerHTML = `<span class="status-ok">✔ 正解</span> (入力: ${userVal || '空欄'})`;
+            } else {
+                inputEl.classList.add('incorrect');
+                li.innerHTML = `<span class="status-ng">✖ 不正解</span> (入力: ${userVal || '空欄'} / 正答例: ${item.blank.answers[0]})`;
+            }
+            detailsList.appendChild(li);
+        });
+
+        // 順不同グループの判定
+        for (const groupName in groups) {
+            const groupItems = groups[groupName];
+            // 判定用に正解のプールを作る (配列の配列)
+            let answerPool = groupItems.map(item => item.blank.answers);
+
+            groupItems.forEach(item => {
+                const inputEl = document.getElementById(`input-${item.idx}`);
+                const userVal = inputEl.value.trim().toLowerCase();
+                inputEl.disabled = true;
+
+                let matchedPoolIndex = -1;
+                for (let i = 0; i < answerPool.length; i++) {
+                    if (answerPool[i] && answerPool[i].some(ans => ans.toLowerCase() === userVal)) {
+                        matchedPoolIndex = i;
+                        break;
+                    }
+                }
+
+                const li = document.createElement('li');
+                
+                if (matchedPoolIndex !== -1) {
+                    inputEl.classList.add('correct');
+                    correctCount++;
+                    answerPool[matchedPoolIndex] = null; // 使った正解をプールから消す
+                    li.className = 'ans-item item-ok';
+                    li.innerHTML = `<span class="status-ok">✔ 正解 [順不同]</span> (入力: ${userVal})`;
+                } else {
+                    inputEl.classList.add('incorrect');
+                    li.className = 'ans-item item-ng';
+                    // プールに残っている最初の正解候補を提示
+                    const remainingAns = answerPool.find(arr => arr !== null);
+                    const suggestedAns = remainingAns ? remainingAns[0] : groupItems[0].blank.answers[0];
+                    li.innerHTML = `<span class="status-ng">✖ 不正解 [順不同]</span> (入力: ${userVal || '空欄'} / 正答例: ${suggestedAns})`;
+                }
+                detailsList.appendChild(li);
+            });
+        }
+
+        // 結果表示UI
+        document.getElementById('submit-btn').style.display = 'none';
+        
+        const feedbackTitle = document.getElementById('feedback-title');
+        if (correctCount === q.blanks.length) {
+            feedbackTitle.textContent = "🎉 全問正解！";
+            feedbackTitle.style.color = "var(--success-color)";
+        } else {
+            feedbackTitle.textContent = `⚠️ ${q.blanks.length}箇所中 ${correctCount}箇所正解`;
+            feedbackTitle.style.color = "var(--error-color)";
+        }
+
+        document.getElementById('explanation-text').innerHTML = `<strong>【解説・出典】</strong><br>${q.explanation}`;
+        document.getElementById('feedback-box').classList.add('show');
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        if (currentQIndex < quizData.length) {
+            renderQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+        
+        document.getElementById('final-score').textContent = `修了！`;
+        document.getElementById('score-comment').textContent = "すべての問題の演習が完了しました。講義資料の重要語句の網羅的な復習ができています。";
+    }
+</script>
+
+</body>
+</html>
