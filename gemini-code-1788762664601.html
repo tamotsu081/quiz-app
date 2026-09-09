@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>医療と法律 高難度確認問題集</title>
+<style>
+  body { font-family: "Helvetica Neue", Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f4f5f7; color: #333; }
+  h1 { text-align: center; color: #2c3e50; }
+  .description { text-align: center; margin-bottom: 20px; font-size: 0.95em; color: #555; }
+  .question-block { background: #fff; border: 1px solid #e1e4e8; border-radius: 8px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+  .chapter-title { font-weight: bold; color: #0056b3; margin-bottom: 8px; font-size: 1.1em; }
+  .q-instruction { font-weight: bold; color: #d32f2f; margin-bottom: 12px; }
+  .option { display: block; padding: 12px; margin: 8px 0; border: 1px solid #d1d5da; border-radius: 6px; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; background-color: #fafbfc; }
+  .option:hover { background-color: #f0f8ff; }
+  .correct-ans { background-color: #d4edda !important; border-color: #c3e6cb !important; }
+  .incorrect-ans { background-color: #f8d7da !important; border-color: #f5c6cb !important; }
+  .feedback { margin-top: 15px; padding: 10px; border-radius: 6px; display: none; font-size: 0.95em; }
+  .feedback.success { background-color: #e6ffed; border: 1px solid #b7ebc6; color: #1a7f37; }
+  .feedback.error { background-color: #ffebe9; border: 1px solid #ff8182; color: #cf222e; }
+</style>
+</head>
+<body>
+
+<h1>医療と法律 高難度確認問題集 (全36問)</h1>
+<p class="description">問題ごとに「正しいものを1つ選べ」と「誤っているものを1つ選べ」が混在しています。<br>選択肢をクリックして解答・答え合わせを行ってください。</p>
+
+<div id="quiz-container"></div>
+
+<script>
+// 問題データ (全150項目の組み込み)
+const quizData = [
+  // --- 第1章 ---
+  {
+    ch: "第1章 (1-1 ～ 1-4)", type: "correct",
+    options: [
+      { text: "憲法11条が保障する基本的生命は永久の権利であり、13条では教育権について最大の尊重を必要とするとされている。[cite: 10]", isTarget: false, exp: "1-1の誤り。正しくは基本的「人権」、13条は「幸福追求権」です。[cite: 9]" },
+      { text: "憲法25条ではすべて国民は裕福で文化的な最低限度の生活を営む権利を有すると規定されており、これは生活権ともいわれる。[cite: 10]", isTarget: false, exp: "1-2の誤り。正しくは「健康」で文化的な最低限度の生活、ならびに「生存権」です。[cite: 9]" },
+      { text: "法律は国会の議決を経て制定するが、施行規則は一般に省令とも呼ばれ、各省が制定する。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "施行令は一般に省令とも呼ばれ、各省が制定する。[cite: 10]", isTarget: false, exp: "1-4の誤り。施行令は「政令」と呼ばれ、「政府」が制定します。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第1章 (1-5 ～ 1-8)", type: "incorrect",
+    options: [
+      { text: "同順位の法の間では後に制定されたものが優先し、一般法と特別法では特別法が優先する。[cite: 9, 10]", isTarget: false },
+      { text: "法令条文で一般に条の中で、別行で区分された段落を項といい、複数の項目を並べる箇条書きを号という。[cite: 9, 10]", isTarget: false },
+      { text: "法令文において「6月1日から3日間」とは、6月1日から6月3日までを指す。[cite: 10]", isTarget: true, exp: "1-7の誤り。「6月4日」までを指します。[cite: 9]" },
+      { text: "法令条文等で「遅滞なく」という表現は、合理的な理由があれば遅延が許されるが、理由が無ければ直ちに行うべき事項である。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第1章 (1-9 ～ 1-12)", type: "correct",
+    options: [
+      { text: "印刷した氏名に捺印する「記名押印」は無効である。[cite: 10]", isTarget: false, exp: "1-9の誤り。記名押印は「有効」です。[cite: 9]" },
+      { text: "世界中の子どもたちの命と健康を守るために活動する国連機関の略称はUNHCRである。[cite: 10]", isTarget: false, exp: "1-10の誤り。正しくは「UNICEF」です。[cite: 9]" },
+      { text: "WHO、国連食糧農業機関、国際労働機関は国連の専門機関であり、開発途上国へ国際協力を行う日本の機関をJICAと略称する。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "厚生労働省内では、医事法令は保険局が担当している。[cite: 10]", isTarget: false, exp: "1-12の誤り。医事法令を担当するのは「医政局」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第1章 (1-13 ～ 1-17)", type: "incorrect",
+    options: [
+      { text: "医業とは医行為を反復継続の意思をもって行うことであり、報酬を受けたか否かは関係しない。[cite: 9, 10]", isTarget: false },
+      { text: "医行為の3条件とは、治療を目的としていること、承認された方法で行われていること、患者本人の承諾があることである。[cite: 9, 10]", isTarget: false },
+      { text: "免許等を取得するために備えなければならない要件を消極的要件といい、備えていてはならない要件を不可事由という。[cite: 10]", isTarget: true, exp: "1-15の誤り。正しくは「積極的要件」と「欠格事由」です。[cite: 9]" },
+      { text: "相対的欠格事由とは、その程度によって免許を与えられないことがある事由である。[cite: 9, 10]", isTarget: false },
+      { text: "資格取得者以外の者に資格の呼称の利用が禁止されていることを名称独占という。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+
+  // --- 第3章 ---
+  {
+    ch: "第3章 (3-1 ～ 3-4)", type: "correct",
+    options: [
+      { text: "医療法は、診療報酬の規定、病院・診療所・薬局の開設等を定めた法律である。[cite: 10]", isTarget: false, exp: "3-1の誤り。適切な選択の支援や医療安全、助産所の開設等について定めています（診療報酬・薬局は誤りのダミー）。[cite: 9]" },
+      { text: "医療を提供するにあたり、適切な説明を行い理解を得るよう努めることをムンテラという。[cite: 10]", isTarget: false, exp: "3-2の誤り。正しくは「インフォームドコンセント」です。[cite: 9]" },
+      { text: "病院は20床以上の病床を持つ施設であり、診療所は19床まで病床を持つことができる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "地域医療支援病院は100床以上を有し、都道府県知事の承認を得たへき地医療の提供能力を持つ病院である。[cite: 10]", isTarget: false, exp: "3-4の誤り。「200床」以上であり、「救急医療」の提供能力を持つ病院です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-5 ～ 3-8)", type: "incorrect",
+    options: [
+      { text: "特定機能病院は400床以上を有し、厚生労働大臣の承認を得た高度の医療提供能力を持つ病院である。[cite: 9, 10]", isTarget: false },
+      { text: "臨床研究中核病院は400床以上を有し、厚生労働大臣の承認を得た病院である。[cite: 9, 10]", isTarget: false },
+      { text: "助産所は9床以下の入所施設を持つことができる。[cite: 9, 10]", isTarget: false },
+      { text: "医学的管理下の介護等を行い居宅生活を営めるようにすることを目的とするのが介護医療院であり、長期療養が必要な者に対応するのが介護老人保健施設である。[cite: 10]", isTarget: true, exp: "3-8の誤り。説明が逆です。居宅復帰目的が「介護老人保健施設」、長期療養が「介護医療院」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-9 ～ 3-12)", type: "correct",
+    options: [
+      { text: "病院等の管理者は毎月、施設の基本的事項を都道府県知事に報告し公表しなければならない。[cite: 10]", isTarget: false, exp: "3-9の誤り。報告は「1年に1回」です。[cite: 9]" },
+      { text: "病院は患者を入院させたとき、7日以内に入院中の治療計画等を記載した入院診療計画書の作成と適切な説明を行わなければならない。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "医療に関する広告の内容及び方法は、現在ではほとんど規制されなくなった。[cite: 10]", isTarget: false, exp: "3-11の誤り。依然として「規制されている」が正解です。[cite: 9]" },
+      { text: "医療関連広告では、事実に基づいて手術件数が全国1位であることなどは広告できる。[cite: 10]", isTarget: false, exp: "3-12の誤り。事実であっても「も広告できない」が正解です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-13 ～ 3-16)", type: "incorrect",
+    options: [
+      { text: "医療法において、院内感染対策、医薬品の安全管理体制、医療機器の保守点検・安全使用に関する体制、診療用放射線に係る安全管理等が規定されている。[cite: 9, 10]", isTarget: false },
+      { text: "医療法において院内感染防止については、指針の策定、感染対策委員会の開催、職員研修等の実施を求めている。[cite: 9, 10]", isTarget: false },
+      { text: "医療機器に関する医療安全対策は、指針の策定、医療機器安全管理責任者の配置、職員研修、保守点検計画及び実施等の規定がある。[cite: 9, 10]", isTarget: false },
+      { text: "病院等の管理者は、医療事故が発生した場合、厚生労働大臣が指定した医療事故監視センターに遅滞なく報告しなければならない。[cite: 10]", isTarget: true, exp: "3-16の誤り。正しくは「医療事故調査・支援センター」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-17 ～ 3-20)", type: "correct",
+    options: [
+      { text: "都道府県等は患者からの苦情や相談に対応するため、医療事故支援センターを設けるよう努める。[cite: 10]", isTarget: false, exp: "3-17の誤り。正しくは「医療安全支援センター」です。[cite: 9]" },
+      { text: "看護師は、医療安全に関する医薬品安全管理責任者等に、十分な知識を有していてもなることはできない。[cite: 10]", isTarget: false, exp: "3-18の誤り。知識を有して「いればなることができる」が正解です。[cite: 9]" },
+      { text: "病院を開設するときは厚生労働大臣の許可を得なければならず、病床数を増やす場合は届け出だけでよい。[cite: 10]", isTarget: false, exp: "3-19の誤り。開設は「都道府県知事」の許可であり、届出で済むのは「減らす」場合です。[cite: 9]" },
+      { text: "病床には精神病床、感染症病床、結核病床、療養病床、一般病床の種別がある。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-21 ～ 3-24)", type: "incorrect",
+    options: [
+      { text: "病院の管理者は臨床研修修了医師でなければならない。[cite: 9, 10]", isTarget: false },
+      { text: "診療所を開設するときは都道府県知事に届出をしなければならない。ただし病床を有する場合は許可が必要である。[cite: 9, 10]", isTarget: false },
+      { text: "病院の管理者は医師を宿直させなければならないが、隣接する病院敷地外に待機している場合も認められない。[cite: 10]", isTarget: true, exp: "3-23の誤り。待機している場合は「認められる場合がある」が正解です。[cite: 9]" },
+      { text: "病院の管理者は毎月、病院報告を保健所長に提出する。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第3章 (3-25 ～ 3-28)", type: "correct",
+    options: [
+      { text: "病院で検体検査や患者等に貸与する衣類の洗濯等の業務を委託する時は、医療法施行規則で定める基準に適合するものに委託しなければならない。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "医療法には病院の医師数や薬剤師数についての規定はあるが、検査技師数や看護師数についての規定はない。[cite: 10]", isTarget: false, exp: "3-26の誤り。「看護師数」についても規定されています。[cite: 9]" },
+      { text: "看護師の数は一般の病院において、一般病床では患者2人に1人、療養病床では患者3人に1人として配置しなければならない。[cite: 10]", isTarget: false, exp: "3-27の誤り。一般病床は「3人に1人」、療養病床は「4人に1人」です。[cite: 9]" },
+      { text: "看護師の数は、外来患者20人に対し1人置かなければならない。[cite: 10]", isTarget: false, exp: "3-28の誤り。外来患者「30人」に対して1人です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-29 ～ 3-32)", type: "incorrect",
+    options: [
+      { text: "病床数100床以上の病院では栄養士1人を、特定機能病院では管理栄養士1人を置かなければならない。[cite: 9, 10]", isTarget: false },
+      { text: "病院等は清潔であり安全でなければならず、医療法等により換気や照明に関しても基準が定められている。[cite: 9, 10]", isTarget: false },
+      { text: "病院の一般病室は患者1人当たり4.3m²以上でなければならない。[cite: 10]", isTarget: true, exp: "3-31の誤り。一般病室は患者1人当たり「6.4m²以上」です。[cite: 9]" },
+      { text: "病院の一般病床の廊下は、両側に居室がある場合は2.1m以上、片側だけの場合は1.8m以上必要とされている。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第3章 (3-33 ～ 3-37)", type: "correct",
+    options: [
+      { text: "地階に病室を設置することはできる。[cite: 10]", isTarget: false, exp: "3-33の誤り。地階への病室設置は「できない」とされています。[cite: 9]" },
+      { text: "病院には診察室や集中治療室等を設ける必要があり、地域医療支援病院では無菌状態が維持できる病室を備えなければならない。[cite: 10]", isTarget: false, exp: "3-34の誤り。病院には「臨床検査施設」などが必要で、地域支援は「病理解剖室」が必要です。[cite: 9]" },
+      { text: "病院は診療に関する諸記録を医療法により2年間保存しなければならず、これに診療録も含まれる。[cite: 10]", isTarget: false, exp: "3-35の誤り。診療録は含まれません（医師法により5年保存）。[cite: 9]" },
+      { text: "都道府県知事等は必要があるときは医療監視員を病院に立ち入らせ、設備等を検査させることができる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "医療計画は市町村が3年ごとに目標の達成状況等の評価を行う。[cite: 10]", isTarget: false, exp: "3-37の誤り。「都道府県」が「6年」ごとに行います。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-38 ～ 3-42)", type: "incorrect",
+    options: [
+      { text: "医療計画は地域の実情に応じ医療提供体制の確保を図るため定めるもので、各区域内の病床数に関し基準を定めている。[cite: 9, 10]", isTarget: false },
+      { text: "医療計画において医療の確保に必要な事業とは、救急医療、災害医療、へき地医療、周産期医療、小児医療等をいう。[cite: 9, 10]", isTarget: false },
+      { text: "広範かつ継続的な医療の提供が必要と認められる5疾病とは、がん、脳卒中、急性心筋梗塞、糖尿病、精神疾患をいう。[cite: 9, 10]", isTarget: false },
+      { text: "計画では病院間の連携等が求められ、居宅等における保健医療サービス等との連携についても同様に配慮する。[cite: 9, 10]", isTarget: false },
+      { text: "医療計画において、2次医療圏は都道府県を分割した単位であるが、3次医療圏は市町村を単位とした圏域である。[cite: 10]", isTarget: true, exp: "3-42の誤り。3次医療圏は「都道府県」を単位とした圏域です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第3章 (3-43 ～ 3-47)", type: "correct",
+    options: [
+      { text: "救急病院は災害基本法の規定に基づき規定している。[cite: 10]", isTarget: false, exp: "3-43の誤り。正しくは「消防法」の規定に基づきます。[cite: 9]" },
+      { text: "法人とは、通常の人間個人ではなく一定の社会的活動を営む組織体で、法律により特に権利能力を認められたものをいい、病院等を開設できる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "医療用酸素のガスボンベの色は白色で、配管の色は黄色である。[cite: 10]", isTarget: false, exp: "3-45の誤り。ボンベは「黒色」、配管は「緑色」です。[cite: 9]" },
+      { text: "病室内の温度は28℃程度、湿度は35%程度が望ましい。[cite: 10]", isTarget: false, exp: "3-46の誤り。温度は「20〜24℃」、湿度は「50%」程度が望ましいです。[cite: 9]" },
+      { text: "病室の明るさは100Lx程度で、読書用照明には400Lx程度とするのが望ましい。[cite: 10]", isTarget: false, exp: "3-47の誤り。読書用照明は「300Lx」程度です。[cite: 9]" }
+    ]
+  },
+
+  // --- 第4章 ---
+  {
+    ch: "第4章 (4-1 ～ 4-4)", type: "incorrect",
+    options: [
+      { text: "免許等を取得するために備えなければならない要件を積極的要件、備えていてはならない要件を欠格事由という。[cite: 9, 10]", isTarget: false },
+      { text: "相対的欠格事由とは、その程度によって免許を与えられないことがある事由である。[cite: 9, 10]", isTarget: false },
+      { text: "資格取得者以外の者に資格の呼称の利用が禁止されていることを名称独占という。[cite: 9, 10]", isTarget: false },
+      { text: "医師の免許は、国家試験に合格し、免許証が交付されることによって行われる。[cite: 10]", isTarget: true, exp: "4-4の誤り。免許は「医籍に登録」されることによって行われます。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第4章 (4-5 ～ 4-8)", type: "correct",
+    options: [
+      { text: "医師の絶対的欠格事由は成年被後見人であることが該当する。[cite: 10]", isTarget: false, exp: "4-5の誤り。正しくは「未成年者」です。[cite: 9]" },
+      { text: "診療に従事する医師が、正当な理由なく診察や治療の求めを拒んではならないことを業務独占という。[cite: 10]", isTarget: false, exp: "4-6の誤り。正しくは「応召義務」です。[cite: 9]" },
+      { text: "診療中の患者が12時間以内に死亡した場合には、改めて診察を行わなくとも死亡診断書を交付して差し支えない。[cite: 10]", isTarget: false, exp: "4-7の誤り。「24時間」以内であれば診察を行わなくとも交付できます。[cite: 9]" },
+      { text: "医師は診療後なるべく早く診療に関する事項を診療録に記載しなければならず、その保存期間は5年である。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" }
+    ]
+  },
+  {
+    ch: "第4章 (4-9 ～ 4-12)", type: "incorrect",
+    options: [
+      { text: "医師の守秘義務は刑法に規定されている。[cite: 9, 10]", isTarget: false },
+      { text: "診療に従事する医師は2年、歯科医師は1年の臨床研修を受けなければならない。[cite: 9, 10]", isTarget: false },
+      { text: "薬剤師は調剤後、処方箋に調剤済みであること等を記入し、2年間保存しなければならない。[cite: 10]", isTarget: true, exp: "4-11の誤り。処方箋は「3年間」保存しなければなりません。[cite: 9]" },
+      { text: "薬剤師は、交付した医師の署名がある処方箋に疑義があるとき、その通り調剤してはならない。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第4章 (4-13 ～ 4-16)", type: "correct",
+    options: [
+      { text: "診療放射線技師は放射線を照射したとき、診療録を作成し、照射した患者等の署名を受けておかなければならない。[cite: 10]", isTarget: false, exp: "4-13の誤り。作成するのは「照射録」であり、「指示した医師等」の署名を受けます。[cite: 9]" },
+      { text: "放射線の照射業務は診療の補助であるため、看護師が行うことができる。[cite: 10]", isTarget: false, exp: "4-14の誤り。診療の補助「ではないため」、看護師は「できない」が正解です。[cite: 9]" },
+      { text: "臨床検査技師は診療の補助として鼻腔ぬぐい液等を採取できるが、検査のために肘静脈から採血することはできない。[cite: 10]", isTarget: false, exp: "4-15の誤り。肘静脈から採血することも「できる」が正解です。[cite: 9]" },
+      { text: "都道府県知事の登録を受けた衛生検査所では血液検査や細菌検査等ができる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" }
+    ]
+  },
+  {
+    ch: "第4章 (4-17 ～ 4-20)", type: "incorrect",
+    options: [
+      { text: "理学療法士はPhysical Therapistという。[cite: 9, 10]", isTarget: false },
+      { text: "身体に障害のある者に対し、運動を行わせたり物理的手段を加えることを業とする者を理学療法士という。[cite: 9, 10]", isTarget: false },
+      { text: "言語聴覚士は診療の補助として嚥下訓練等をすることができる。[cite: 9, 10]", isTarget: false },
+      { text: "臨床工学技士は針を穿刺せずに採血することができる。[cite: 10]", isTarget: true, exp: "4-20の誤り。臨床工学技士は針を穿刺「して」採血することができます。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第4章 (4-21 ～ 4-24)", type: "correct",
+    options: [
+      { text: "生命維持管理装置の操作や保守点検を行うことを業とする者を臨床工学技士という。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "義肢装具士は義肢・装具の製作や身体への適合を行うが、装着部位の採型はできない。[cite: 10]", isTarget: false, exp: "4-22の誤り。装着部位の採型「もできる」が正解です。[cite: 9]" },
+      { text: "診療の補助として嚥下訓練や人工内耳の調整等ができる者を視能訓練士という。[cite: 10]", isTarget: false, exp: "4-23の誤り。正しくは「言語聴覚士」です。[cite: 9]" },
+      { text: "救急救命士は原則的に救急用自動車以外の場所でも業務を行える。[cite: 10]", isTarget: false, exp: "4-24の誤り。原則として救急用自動車以外の場所で「行ってはならない」が正解です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第4章 (4-25 ～ 4-28)", type: "incorrect",
+    options: [
+      { text: "歯牙露出面等の付着物を機械的操作によって除去出来るのは、歯科医師と歯科衛生士である。[cite: 9, 10]", isTarget: false },
+      { text: "はり師はきゅうを、きゅう師は針の施術をすることはできない。[cite: 9, 10]", isTarget: false },
+      { text: "心理状態の観察や分析、相談等を業とする者は精神保健福祉士である。[cite: 10]", isTarget: true, exp: "4-27の誤り。正しくは「公認心理師」です。[cite: 9]" },
+      { text: "精神障害者の社会復帰に関する相談や援助を業とする者は精神保健福祉士である。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第4章 (4-29 ～ 4-33)", type: "correct",
+    options: [
+      { text: "管理栄養士は都道府県知事の免許を受け、傷病者に対する療養のために必要な栄養の指導等を行う。[cite: 10]", isTarget: false, exp: "4-29の誤り。管理栄養士は「厚生労働大臣」の免許を受けます。[cite: 9]" },
+      { text: "作業療法士は身体上または精神上の障害等により日常生活を営むのに支障がある者の相談や援助を行う者である。[cite: 10]", isTarget: false, exp: "4-30の誤り。正しくは「社会福祉士」です。[cite: 9]" },
+      { text: "介護福祉士が行う介護には喀痰の吸引なども含まれ、医師の指示のもとに行う。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "獣医師は国家試験により文部科学大臣の免許を受けなければならない。[cite: 10]", isTarget: false, exp: "4-32の誤り。獣医師は「農林水産大臣」の免許を受けます。[cite: 9]" },
+      { text: "愛玩動物看護師は国家試験に合格し、総務大臣の免許を受けなければならない。[cite: 10]", isTarget: false, exp: "4-33の誤り。愛玩動物看護師は「農林水産大臣・環境大臣」の免許を受けます。[cite: 9]" }
+    ]
+  },
+
+  // --- 第5章 ---
+  {
+    ch: "第5章 (5-1 ～ 5-4)", type: "incorrect",
+    options: [
+      { text: "医療及び介護の総合的な確保を促進することを目的とするのは、地域における医療及び介護の総合的な確保の促進に関する法律である。[cite: 9, 10]", isTarget: false },
+      { text: "高齢者が住み慣れた地域で生活できるよう支援が確立される体制を高齢者複合型サービスシステムという。[cite: 10]", isTarget: true, exp: "5-2の誤り。正しくは「地域包括ケアシステム」です。[cite: 9]" },
+      { text: "地域包括支援センターの主な設置主体は市町村等自治体で、保健師、社会福祉士、主任ケアマネージャー等が置かれる。[cite: 9, 10]", isTarget: false },
+      { text: "地域包括支援センターの主な機能には、介護予防マネジメント、総合相談・支援、権利擁護事業、包括的・継続的マネジメントがある。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第5章 (5-5 ～ 5-8)", type: "correct",
+    options: [
+      { text: "JCHOとは独立行政法人国立病院機構のことである。[cite: 10]", isTarget: false, exp: "5-5の誤り。JCHOは「独立行政法人地域医療機能推進機構」のことです。[cite: 9]" },
+      { text: "臓器の移植に関する法律で規定する臓器は、心臓等の他、大腸、骨髄が規定されている。[cite: 10]", isTarget: false, exp: "5-6の誤り。規定されているのは「腎臓」「小腸」等です。[cite: 9]" },
+      { text: "臓器移植は15歳未満の者から移植することができる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "わが国では、一般に人の死は呼吸の停止、脈拍の停止、腱反射消失を基礎として総合的に判定している。[cite: 10]", isTarget: false, exp: "5-8の誤り。腱反射消失ではなく「瞳孔散大」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第5章 (5-9 ～ 5-12)", type: "incorrect",
+    options: [
+      { text: "脳死とは、脳幹を含む全脳の機能が不可逆的に停止するに至ったと判定された状態をいう。[cite: 9, 10]", isTarget: false },
+      { text: "移植に係る脳死判定は、深昏睡、瞳孔固定4mm以上、脳幹反射消失、平坦脳波、自発呼吸の消失等の確認が必要である。[cite: 9, 10]", isTarget: false },
+      { text: "成人の脳死判定は臓器を摘出する医師の判断によって行われ、通常12時間を経て行わなければならない。[cite: 10]", isTarget: true, exp: "5-11の誤り。臓器の摘出等に関与しない2名の医師により、通常「6時間以上」を経て行われます。[cite: 9]" },
+      { text: "患者が提供の意思を示す書面があっても遺族が拒む場合は提供不可であり、遺族がない場合は提供可である。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第5章 (5-13 ～ 5-16)", type: "correct",
+    options: [
+      { text: "患者の提供意思が不明の場合、遺族が書面で承諾しても臓器移植は提供不可である。[cite: 10]", isTarget: false, exp: "5-13の誤り。遺族が書面で承諾した場合は「提供可」です。[cite: 9]" },
+      { text: "臓器斡旋機関は厚生労働大臣の許可を受けなければならない。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "移植に関する法律で規定する造血幹細胞は、iPS細胞や受精卵である。[cite: 10]", isTarget: false, exp: "5-15の誤り。正しくは「骨髄」「末梢血幹細胞」「臍帯血」です。[cite: 9]" },
+      { text: "人工多能性幹細胞(iPS細胞など)を用いる医療技術は第2種再生医療等である。[cite: 10]", isTarget: false, exp: "5-16の誤り。正しくは「第1種再生医療等」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第5章 (5-17 ～ 5-20)", type: "incorrect",
+    options: [
+      { text: "死産とは妊娠4ヵ月以後における死児の出産で、心臓拍動、随意筋の運動及び呼吸のいずれをも認めないものをいう。[cite: 9, 10]", isTarget: false },
+      { text: "死産の届出は死産証書等を添えて、5日以内に保健所長に提出しなければならない。[cite: 10]", isTarget: true, exp: "5-18の誤り。死産の届出は「7日」以内に「市町村長もしくは区長」に提出します。[cite: 9]" },
+      { text: "病因の解明のために行う解剖を病理解剖という。[cite: 9, 10]", isTarget: false },
+      { text: "死体の解剖を行う場合、一定の場合を除いて保健所長の許可を受けなければならない。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第5章 (5-21 ～ 5-24)", type: "correct",
+    options: [
+      { text: "地域災害拠点病院は原則として、1次医療圏ごとに1か所整備することとしている。[cite: 10]", isTarget: false, exp: "5-21の誤り。「2次医療圏」ごとに整備します。[cite: 9]" },
+      { text: "DMATは災害派遣医療チーム、DPATは災害派遣精神医療チーム、DHEATは健康危機管理チームの事である。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "国が災害拠点病院を指定し、地域災害拠点病院を市町村ごとに整備する。[cite: 10]", isTarget: false, exp: "5-23の誤り。「都道府県」が指定し、「2次医療圏」ごとに整備します。[cite: 9]" },
+      { text: "地域保健法は地域介護施設や精神保健福祉センターの設置について規定したものである。[cite: 10]", isTarget: false, exp: "5-24の誤り。「保健所」や「市町村保健センター」の設置運営について規定しています。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第5章 (5-25 ～ 5-29)", type: "incorrect",
+    options: [
+      { text: "保健所は都道府県、指定都市、特別区等が設置する。[cite: 9, 10]", isTarget: false },
+      { text: "保健所の事業には、人口動態統計等のほか、介護保険の認定に関する事項等を行う。[cite: 10]", isTarget: true, exp: "5-26の誤り。介護保険ではなく「精神保健に関する事項」「難病の保健に関する事項」等を行います。[cite: 9]" },
+      { text: "保健師、看護師、助産師、歯科衛生士は保健所の長の指示を受けたときは基本的に従わなければならない。[cite: 9, 10]", isTarget: false },
+      { text: "市町村は、住民の健康相談等を行う拠点として市町村保健センターを設置することが出来る。[cite: 9, 10]", isTarget: false },
+      { text: "健康増進法では受動喫煙防止、特別用途表示食品、国民健康・栄養調査等の施策がある。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第5章 (5-30 ～ 5-34)", type: "correct",
+    options: [
+      { text: "厚生労働大臣は健康増進計画を定め、市町村は健康診査等指針を定める。[cite: 10]", isTarget: false, exp: "5-30の誤り。健康増進計画を定めるのは「都道府県」です。[cite: 9]" },
+      { text: "特定給食施設とは、継続的に1回100食以上又は1日250食以上の食事を供給する施設とされている。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "特定かつ限られた者に継続的に食事を供給する施設の設置者は、厚生労働大臣に届け出なければならない。[cite: 10]", isTarget: false, exp: "5-32の誤り。特定かつ「多数」であり、「都道府県知事」に届け出ます。[cite: 9]" },
+      { text: "都道府県知事が指定する特定給食施設の設置者は、当該施設に栄養士を置かなければならない。[cite: 10]", isTarget: false, exp: "5-33の誤り。栄養士ではなく「管理栄養士」を置かなければなりません。[cite: 9]" },
+      { text: "健康増進法の規定により第2種施設である学校や病院では、特定屋外喫煙場所以外で喫煙してはならない。[cite: 10]", isTarget: false, exp: "5-34の誤り。学校や病院は「第1種施設」です。[cite: 9]" }
+    ]
+  },
+
+  // --- 第6章 ---
+  {
+    ch: "第6章 (6-1 ～ 6-4)", type: "incorrect",
+    options: [
+      { text: "精神保健及び精神障害者福祉に関する法律は、昭和25年に制定された精神保健法が改正を経て現在の名称となった。[cite: 10]", isTarget: true, exp: "6-1の誤り。昭和25年に制定されたのは「精神衛生法」です。[cite: 9]" },
+      { text: "都道府県等は精神保健福祉センターを設置し、精神医療審査会の事務等を行う。[cite: 9, 10]", isTarget: false },
+      { text: "精神保健指定医は厚生労働大臣が指定し、5年ごとに研修を受けなければ更新できない。[cite: 9, 10]", isTarget: false },
+      { text: "医療保護入院や応急入院の際には、精神保健指定医の診察が必要である。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第6章 (6-5 ～ 6-8)", type: "correct",
+    options: [
+      { text: "任意入院の場合、退院の申し出があっても指定医が認めたときは120時間以内は退院させないことができる。[cite: 10]", isTarget: false, exp: "6-5の誤り。120時間以内ではなく「72時間」以内です。[cite: 9]" },
+      { text: "医療保護入院は本人の同意がなく、市町村長の同意があることにより入院させる場合をいう。[cite: 10]", isTarget: false, exp: "6-6の誤り。市町村長ではなく「家族等」の同意です。[cite: 9]" },
+      { text: "市町村長は1人以上の指定医の診察で自傷他害の恐れがあると認めたとき措置入院させることが出来る。[cite: 10]", isTarget: false, exp: "6-7の誤り。「都道府県知事」が「2人」以上の指定医の診察で措置入院させることができます。[cite: 9]" },
+      { text: "緊急措置入院とは、都道府県知事が急を要する場合、1人の指定医の診察により72時間に限り入院させることが出来るものである。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" }
+    ]
+  },
+  {
+    ch: "第6章 (6-9 ～ 6-12)", type: "incorrect",
+    options: [
+      { text: "精神保健指定医が必要と認めた場合、身体拘束や信書の発受の制限はできるが弁護士との面会制限はできない。[cite: 9, 10]", isTarget: false },
+      { text: "12時間未満の患者の隔離は、看護師の判断で出来る。[cite: 10]", isTarget: true, exp: "6-10の誤り。看護師ではなく「精神保健指定医以外の医師」の判断で可能です。[cite: 9]" },
+      { text: "隔離や身体拘束を行った場合、その理由、開始日時、解除日時を診療録に記載しなければならない。[cite: 9, 10]", isTarget: false },
+      { text: "直ちに入院が必要な者について家族の同意があるとき、都道府県知事は応急入院指定病院に移送できる。[cite: 9, 10]", isTarget: false }
+    ]
+  },
+  {
+    ch: "第6章 (6-13 ～ 6-16)", type: "correct",
+    options: [
+      { text: "患者の家族から処遇改善の請求を受けた都道府県知事は、精神保健福祉審議会の審査を求める。[cite: 10]", isTarget: false, exp: "6-13の誤り。審議会ではなく「精神医療審査会」の審査を求めます。[cite: 9]" },
+      { text: "市町村長は必要があるときは指定医に診察させ、意見が一致しない場合は指定医に対して退院を命ずることができる。[cite: 10]", isTarget: false, exp: "6-14の誤り。「都道府県知事」が「管理者」に対して退院を命じます。[cite: 9]" },
+      { text: "精神科病院の管理者は退院後生活環境相談員を選任し、要件を満たす看護師や社会福祉士等がなることができる。[cite: 9, 10]", isTarget: true, exp: "正解です。[cite: 9, 10]" },
+      { text: "精神障害者保健福祉手帳の交付を受けた場合、3年ごとに認定を受けなければならない。[cite: 10]", isTarget: false, exp: "6-16の誤り。3年ごとではなく「2年ごと」です。[cite: 9]" }
+    ]
+  },
+  {
+    ch: "第6章 (6-17 ～ 6-19)", type: "incorrect",
+    options: [
+      { text: "精神の障害によりやってよいことと悪いことの判断等が全くできない状態を心神喪失状態という。[cite: 9, 10]", isTarget: false },
+      { text: "重大な他害行為を行った者の医療観察法は、裁判官が診査協議会に申し立てて行われる。[cite: 10]", isTarget: true, exp: "6-18の誤り。「検察官」が「地方裁判所」に申し立てます。[cite: 9]" },
+      { text: "ギャンブル等依存症対策基本法は、国、地方公共団体等の責務を明らかにするものである。[cite: 9, 10]", isTarget: false }
+    ]
+  }
+];
+
+const container = document.getElementById('quiz-container');
+
+quizData.forEach((q, index) => {
+  const block = document.createElement('div');
+  block.className = 'question-block';
+  
+  const title = document.createElement('div');
+  title.className = 'chapter-title';
+  title.textContent = `問${index + 1}：${q.ch}`;
+  block.appendChild(title);
+
+  const qInstruction = document.createElement('div');
+  qInstruction.className = 'q-instruction';
+  qInstruction.textContent = q.type === 'correct' ? "次の記述のうち、【正しいもの】を1つ選べ。" : "次の記述のうち、【誤っているもの】を1つ選べ。";
+  block.appendChild(qInstruction);
+
+  const feedback = document.createElement('div');
+  feedback.className = 'feedback';
+  
+  let answered = false;
+
+  q.options.forEach((opt, i) => {
+    const optDiv = document.createElement('div');
+    optDiv.className = 'option';
+    optDiv.textContent = `${i + 1}. ${opt.text}`;
+    
+    optDiv.addEventListener('click', () => {
+      if(answered) return;
+      answered = true;
+
+      // 正解・不正解のスタイリングを全選択肢に適用
+      const allOpts = block.querySelectorAll('.option');
+      allOpts.forEach((o, idx) => {
+        if(q.options[idx].isTarget) {
+          o.classList.add('correct-ans');
+        } else {
+          o.classList.add('incorrect-ans');
+        }
+      });
+
+      if(opt.isTarget) {
+        feedback.classList.add('success');
+        feedback.innerHTML = `<strong>正解！</strong><br>${opt.exp || "この選択肢が正解です。"}`;
+      } else {
+        feedback.classList.add('error');
+        // 不正解の場合はターゲット（正解となる選択肢）の解説を表示
+        const targetOpt = q.options.find(o => o.isTarget);
+        feedback.innerHTML = `<strong>不正解...</strong><br>正解は選択肢 ${q.options.indexOf(targetOpt) + 1} です。<br>${targetOpt.exp || "この選択肢が正解の対象です。"}`;
+      }
+      feedback.style.display = 'block';
+    });
+    block.appendChild(optDiv);
+  });
+  
+  block.appendChild(feedback);
+  container.appendChild(block);
+});
+</script>
+
+</body>
+</html>
