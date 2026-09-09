@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>精神看護学概論 一問一答クイズ</title>
+<style>
+    body {
+        font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        line-height: 1.8;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f4f8;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+    h1 {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+    .quiz-card {
+        background: white;
+        width: 100%;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        box-sizing: border-box;
+    }
+    .header-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #7f8c8d;
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 10px;
+    }
+    .question-area {
+        font-size: 1.3em;
+        line-height: 2;
+        margin-bottom: 30px;
+        word-break: break-all;
+    }
+    .quiz-input {
+        border: none;
+        border-bottom: 3px solid #bdc3c7;
+        background: transparent;
+        text-align: center;
+        font-size: 1em;
+        color: #2c3e50;
+        margin: 0 5px;
+        padding: 5px;
+        width: 140px;
+        transition: 0.3s;
+        font-family: inherit;
+    }
+    .quiz-input:focus {
+        outline: none;
+        border-bottom-color: #3498db;
+    }
+    .quiz-input.correct {
+        background-color: #d4edda;
+        border-bottom-color: #28a745;
+        color: #155724;
+    }
+    .quiz-input.incorrect {
+        background-color: #f8d7da;
+        border-bottom-color: #dc3545;
+        color: #721c24;
+    }
+    .feedback {
+        min-height: 30px;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        font-weight: bold;
+        text-align: center;
+    }
+    .correct-msg { color: #27ae60; }
+    .incorrect-msg { color: #c0392b; }
+    
+    .answer-display {
+        background-color: #f9f9f9;
+        border-left: 4px solid #f39c12;
+        padding: 15px;
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        display: none;
+    }
+
+    .controls {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+    .btn {
+        padding: 12px 30px;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .btn-check {
+        background-color: #3498db;
+        color: white;
+    }
+    .btn-check:hover { background-color: #2980b9; }
+    
+    .btn-next {
+        background-color: #2ecc71;
+        color: white;
+        display: none;
+    }
+    .btn-next:hover { background-color: #27ae60; }
+    
+    .btn-reset {
+        background-color: #95a5a6;
+        color: white;
+        display: none;
+    }
+    .btn-reset:hover { background-color: #7f8c8d; }
+
+</style>
+</head>
+<body>
+
+<h1>精神看護学概論 一問一答</h1>
+
+<div class="quiz-card" id="quiz-card">
+    <div class="header-info">
+        <div id="progress">問題: 1 / 1</div>
+        <div id="score-display">正解: 0</div>
+    </div>
+    
+    <div class="question-area" id="question-text">
+        <!-- 問題文がここに入ります -->
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    
+    <div class="answer-display" id="answer-display">
+        <!-- 正解表示用 -->
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-check" id="check-btn" onclick="checkAnswer()">判定する (Enter)</button>
+        <button class="btn btn-next" id="next-btn" onclick="nextQuestion()">次の問題へ (Enter)</button>
+        <button class="btn btn-reset" id="reset-btn" onclick="initQuiz()">最初からやり直す</button>
+    </div>
+</div>
+
+<script>
+// 資料の全テキストデータ
+const rawText = `・国民のみんなが対象の法律・・(精神保健福祉法)
+·精神疾患患者数の推移、年々(増加)
+・入院患者数と外来患者数・・外来患者数は(増加)、入院患者数はほぼ(同じ)
+精神看護学=(精神科看護)+(精神保護看護)
+(治療)が必要な状態の人 必ずしも(病気)とは限らない人
+障害者と言われたら→(身体・知的・精神障害)
+・精神障害は脳の病気、迷信や神の仕業ではない: (ヒポクラテス)
+・病気を自然の平衡が崩れた失調: (ガレノス)
+<1789年フランス革命の時期> パリのビセール病院 ピネル/ピュサンの功績(患者の鎖からの解放)
+・エスキロール(モラルトリートメント)
+・ジョンコノリー/ヒル(無拘束運動と開放処遇)
+<1776年アメリカ建国> ピアーズ(わが魂に合うまで) 精神衛生運動につながる
+→1928年(アメリカ精神衛生協会)創設 しかし、設置病の問題が起きた
+(マラリア療法): あえて三日熱マラリア原虫を体内に接種し、熱を利用して治療する
+(持続睡眠療法):鎮静・催眠性の薬物を投与して持続的な傾眠ないし睡眠状態にすることによって治療する
+(インスリンショック療法): 大量のインスリン注射により意図的に重度の低血糖・昏睡状態を引き起こす身体的治療法
+(電気痙攣療法): 頭部に電気刺激を与え脳の痙攣を誘発することによって重度のうつ、統合失調症、躁鬱病を改善する
+(前頭葉切除術(ロボトミー)): 前頭葉の白質を切除し除去する。重度の不安や妄想を鎮める効果 無気力、人格変化、痙攣などの副作用が多発した
+1900年(精神病者監護)法
+・(精神病者監護)法の目的と特徴 目的:(不法監禁)の防止
+特徴:治療についての記載(なし)、精神疾患の(監置)、(監禁)、(社会治安)を重視。(監視義務者)が医師の診断書を添えて警察に届け出れば監禁しても良い
+1919年(精神病院)法
+・(呉秀三)が求めたもの 理念:(無拘束療法)
+(精神病者監護法)の廃止と都道府県に(精神病院)の設置を求めた。でも政府は法律を廃止しなかった
+その結果・・(私宅監置の増加)となった
+・松沢病院の取り組み: (拘束具) (暴力)を廃止・禁止、生活環境の改善、(作業療法)の導入
+1940年(国民優生)法→(悪質遺伝性疾患)の撲滅 昭和(20)年に終戦
+1950年(精神衛生)法 目的: 病院での(治療) 戦後の混乱が始まり、(精神衛生運動)の高まりにより制限された。
+内容:①(精神病者監護)法と(精神病院)法の廃止、法の運用は全て(厚生省)
+②(都道府県)に(精神病院)の設置が義務付け
+③(精神衛生相談所)、(精神衛生鑑定医)
+・向精神薬である(クロルプロマジン)が日本で用いられるようになった
+1964年(ライシャワー)事件
+<改正点> (措置入院)制度、都道府県立(精神衛生センター)設置
+通院公費負担医療の創設など、(指導・訪問事業)を促進
+通報や入院制度の強化など(保安対策)の強化
+精神科病棟の急激な(増設)期 なぜこんなに増えたのか?→精神病院に対する(国庫補助)、(結核病院)の精神病院への転換
+1987年(精神保健)法 ・関連する事件として(宇都宮病院)事件
+<改正点>精神医療審査会、入院時の(告知義務)、(退院)請求、(処遇改善)請求
+(地域生活支援事業)の法定化・(精神障害者社会復帰センター)の創設
+・保護義務者を(保護者)へ・精神障害者の(欠格条件)の変更
+1995年(精神保健福祉)法
+①精神障害者の(医療)および(保健)
+②精神障害者の社会復帰の促進およびその(自立)と(社会経済活動)への参加の促進に必要な援助
+③精神障害者の発生の(予防)とその他の国民の精神的健康の(保持・増進)
+・福祉施設の対象として法的に位置付けられていた→(障害者基本法)
+他の障害と同様に(政治、経済、文化)その他あらゆる分野の活動へ参加を目指すことが定められた
+(障害者総合支援)法基本理念: (基本的人権)を享有する個人としての尊重を支援する
+(医療観察)法:(心神喪失)又は(心神耗弱)の状態で重大な他害行為を行った人に対して、(指定医療機会)で治療形式が心神喪失者や、心神耗弱者の犯罪行為については刑を(減免)する。(鑑定入院)についての規定、保護観察所に(社会復帰調整官)を設置。
+(自殺対策基本)法: 自殺を(個人的)な問題のみとして捉えるのではなく、その背景にさまざまな(社会的)な要因があると考えられた。
+(薬物依存)対策: 危険ドラッグ、覚醒剤などの薬物依存、刑期の一部を(執行猶予)とすることができる。再犯率の高い出所者の(更生)、(社会復帰)
+(アルコール依存)対策: 本人の問題:(循環器疾患)、(がん)、(糖尿病)などのコントロール
+本人以外の問題:(飲酒運転)事故、(DV)、(うつ)など、家庭、家族への深刻な影響
+(認知症)対策: 認知症に人が住み慣れた地域の良い環境で自分らしく暮らし続けるために、必要としていることに的確に答えていくこと。→(新オレンジプラン)
+うつ病併発割合: がん:(13~20)%、脳卒中:(29~36)%、心筋梗塞:(5~69)%、糖尿病:(11)%
+<リエゾン看護の目標> ・(患者、家族)へのサポート・(看護師)へのサポート・(組織)への介入
+<リエゾン精神看護の機能> 直接ケア:患者・家族に対する(面接)、(リラクゼーション)
+間接ケア:看護師に対する(コンサルテーション) 他職種との連携
+看護師の(メンタルヘルス)支援、(教育)、(研究) →個別ではなく(複合的)に提供される
+<直接ケアの目的> 1. 患者の精神状態のアセスメントを行い、(精神状態)に合わせたケアを組み立てて提供する
+2. 最終的に患者自身の(セルフケア)が向上する、あるいはセルフコントロールができるようになる
+3. 患者の(安心感)や(安寧感)が増す
+4. スタッフが患者の精神状態を(理解)した上で精神的ケアを提供し続けられる、あるいはより高い看護ケアを提供できるようになる
+5. (第三者)の立場として客観的に全体のプロセスを捉える
+<精神科リエゾンチーム> (精神科医師)、精神科リエゾンに係る研修を修了した(看護師)、(コメディカル)
+<精神科リエゾンチームの介入> 1. 精神状態の(定期的)なアセスメント 2. 身体科医への薬物療法の(アドバンス) 3.(心理)教育 4.(服薬)指導 5. (看護ケア計画)を一緒に考える 6. 看護スタッフへの(相談)、(アドバンス) 7. 他の(リソース)の紹介
+<コンサルテーションの4つのタイプ>
+・(クライエント)中心のケースコンサルテーション: (患者)の問題に焦点を当てたもの
+・(コンサルティ)中心のケースコンサルテーション: (相談者)に焦点を当てたもの
+・(プログラム)中心の(管理)に関するコンサルテーション: (組織)の問題に焦点
+・(コンサルティ)中心の(管理)に関するコンサルテーション: (管理者)に焦点をあてたもの
+<看護師のメンタルヘルス支援の効果> 1. 看護師の心身の健康の(保持・増進) 2. 看護ケアの(質)の保証 3. 看護師の(キャリア発達)の支援 4. 組織にとっての(リスクマネジメント)
+<精神的健康> 生活する中で困難に対処しながら、社会との繋がりのかなで、生き生きと(自分らしい)生活が送れること。
+<厚生労働省の定義> (情緒的)健康:自己の感情に基づき表現する、(知的)健康:状況に応じて適切に考え、現実的な問題解決ができる、(社会的)健康:他人や社会と建設的で良い関係を築ける
+・精神の健康は(生活の質)に影響する
+アメリカ精神医学会 精神障害の診断・統計マニュアル (DSM) ※精神疾患のみ
+疾患及び関連保健問題の国際系統分類(ICD) ※疾患全般
+国際生活機能分類(ICF) ※生活機能
+(二重拘束):相反するメッセージを同時に送ること
+(共依存): 相手から必要とされることによって、自己の価値を見出す対人関係
+(イネイブラー): 相手を助けるつもりで、実はその回復を妨げる行為を(イネイブリング)といい、その人を(イネイブラー)という
+(アダルトチルドレン): 社会不全家族に育ち、自分の正当な欲求を正当に表出できなくなった人のこと。自己評価が(低い)、自分より他人のニードに(敏感)
+(IP): 何らかの症状を表すことによって、その家族の中で(患者)として認められた人
+(家族ホメオスタシス): 家族が常に問題のある状態を保とうとすること
+(精神保健福祉法)第5条:統合失調症、精神作用物質による急性中毒又はその依存性、知的障害、精神病質そのたの精神疾患を有するもの。
+(自立)と(社会)活動への参加の(促進)が加えられた
+(障害者基本法)第2条:身体障害、知的障害、精神障害その他の心身機能障害があるものであって障害及び(社会障壁)により(継続的)に日常生活又は社会生活に相当な制限を受ける状態にあるもの
+特徵:精神障害者が(初めて) 障害者として(福祉施策)の対象として法的に位置付けられた
+(障害者差別解消法): 障害者を理由とする差別の解消を推進し、全ての国民が、障害の有無によって分け隔てられることなく、相互に人格に(個性)を尊重しながら共生する社会の現実に資すること
+特徴:精神障害は、ただ精神の障害を持つ人ではなく、(社会的障壁)のために生きて行く上での(困難さ)を抱えている
+日常生活や社会生活における障害の活動を制限している社会参加を制約している(社会的障壁)を取り除くことを求めている
+・不当な(差別)の取り扱いの禁止 (合理的配慮)の提供
+(スティグマ): 特定の属性を持つ個人や集団に対して周囲から(否定的)なレッテルや不当な取り扱いがされること
+・精神障害者(知らない)。不十分な(知識) →(恐怖)や(偏見)につながる →根拠のない(スティグマ)につながる
+1980年(国際障害分類)の採択: 疾病により、(機能・形態障害)が引き起こされ、それにより日常生活レベルの(能力障害)、社会レベルの(社会不利)が生じる。機能障害は社会不利に向かって(一方通行)の矢印として表される
+(リカバリー): 症状や障害の有無ではない。自分たちの生活の上の問題を自分たちで解決し、その人が(主体)となってその人らしく生きていくことを追求する。
+危機:危機的状況に陥り、それから逃げることもできず、それまで使い慣れた問題解決手段によっても解決できずに(心理的均衡)を失った状態(カプラン)の精神的危機の定義
+<危機の種類>(発達的)危機: 個人の(ライフサイクル)における成長に伴う危機。例:(離乳)、(入学)、(思春期)、(結婚)、(出産)など
+(状況的)危機:災害・事故・突然の病気など予想のつかない→(偶発的)危機。暴動・不況・失業などによる困窮・離別→(社会的)危機
+何らかの方法で危機を乗り越えられる→その経験が(自信)となり、ストレス(対処能力)が増す。(ストレス)耐性や(レジリエンス)も高まる。危機は脅威ではなく(成長)のチャンス。
+危機にうまく対処できない、対処が遅れる→ある種のストレス (脆弱性)が生じる→危機が繰り返され精神障害に発展する(危険性)が増す
+<危機理論(フィンク)> ①(衝撃)の階段:強烈な(不安)、混乱、(無気力)状態
+②(防衛的退行)の階段:否認、抑圧、(無関心)、(多幸感)
+③(承認)の段階: (悲しみ)、(苦痛)、不安、抑うつ、(苦悶)
+④(適応)の段階:新たな(価値観)、(自己イメージ)の確立
+<死の受容過程(キューブラ・ロス)> (否認)→(怒り)→(取り引き)→(抑うつ)→(受容)
+<ストレス> 心身の負担になる(刺激・出来事・状況)で生じる緊張状態、(ホメオスタシス)を乱す
+(生理的・生物的)ストレッサー:炎症、感染、飢え、睡眠不足
+(物理的・化学的)ストレッサー:暑さ、寒さ、台風襲来、けが、やけど
+(心理的・社会的)ストレッサー: 対人関係、環境変化、仕事の大変さ
+<ストレス反応> ・(第1段階)(警告反応)期: ストレッサーの襲われた時期心身に不調が現れる
+・(第2段階)(抵抗)期: ストレスに抵抗している時期心身の不調を感じなくなる
+・(第3段階)(疲憊(ひはい))期: ストレスへの抵抗力がなくなる、心身の不調が急激に悪化、状況が好転しない場合病気になる可能性が大きい
+<精神保健活動の基本> 危機介入、精神障害に対する3つの予防概念(カプラン)
+ (一次予防):精神障害の(発生)を防ぐ
+ (二次予防):精神障害の(早期発見)と(早期治療)を図る
+ (三次予防):(二次障害)の予防、(リハビリテーション)
+(コーピング): ストレスとなる問題が普段のやり方で乗り越えられなかった時に考えだされる、新しい(行動)や(認知)であり、(創造的)な対応
+(ストレスコーピング): ストレスに対して対処法をしり、ストレス反応を(和らげる)こと
+①(問題解消型)コーピング: 直接にストレスフルな状況に働きかけて変化を促そうとする
+②(情動焦点)コーピング: ストレスそのものの変化ではなく、本人の捉え方を変えて(情緒的)安定を図る
+(レジリエンス): 逆境から(立ち直る)能力。困難な経験から(立ち直る)こと。大きなストレスに直面しても、うまく適応していくプロセス。これが高い人は(ポジティブ)な人で低い人は(ネガティブ)な人
+(ストレングス): 元々その人自身が持つ(強み)。個人の(性格)や(個性)やスキル、周囲の(環境)、興味、願望など
+(自己効力感): ある状況下で、必要な一連の行動をうまく遂行できる可能性についての信念。(成功体験)(代理的体験)(言語的說得)(情動的換気)⇒自己効力感
+ストレスマネジメント: (自分自身)で心身の緊張などのストレス反応に気づき、それを(解決)していくこと。①ストレス反応が生じていることに(気づく) ②ストレス反応を解消するための(具体的)な行動
+(アンガーマネジメント): (怒り)の感情を理解することで上手に(コントロール)する方法。一時の感情に流されず、冷静に(コントロール)できるようになる
+(コーチング):双方的なコニュニケーションにより、対象の自発的な(気づき)や(行動変容)を促す方法。質問を投げかけることで答えを導き出す媒介役として機能するが答えそのものは(教えない)。
+(ノーマライゼーション): 障害者が特別視されることなく住み慣れたい地域で、一般の人と同じような社会生活を営もうとする基本的な考え方
+(障害保健福祉)対策は2003年度から(ノーマライゼーション)の理念に基づき導入された(支援費制度)により充実が図られた。↓入院医療から(地域生活中心)へ
+(障害者自立支援法):身体障害、知的障害に加え(精神) 障害も支援の対象に加えた。(発達障害)も支援の対象に加えた。
+<問題点>障害者の費用負担の(増加)により生活が制限された。在院日数の短縮化が図られたが微減であり、入院から(地域生活)への移行が進まなかった
+(障害総合支援)法: 障害者の日常生活及び社会生活を(総合的)に支援するための法律
+(精神科リハビリテーション): 精神の障害や症状の有無に関わらず、その人が主体となって自分の新しい社会的な役割の獲得を目指す回復
+<精神科のリハビリテーションの目的> ①症状の(軽減) ②(慢性化・二次障害)の予防 ③(生活再建や生活調整)による社会復帰 ④(再発)予防
+(作業)療法:日常生活の中にある(作業活動)を通じて集中力や作業能力の改善、(社会適応能力)の回復を目指す治療法 医師の(処方箋)に基づき(作業療法士)が行う
+(レクリエーション)療法: レクリエーションの活動を通して(社会参加)の促進を目指すもの。活動を通して余暇活動や集団活動の楽しさを感じ、社会的孤立を防ぐ
+(社会生活技能)訓練: (対人関係)や(社会生活)を営むのに必要なスキルを練習する。(認知行動療法)の一つ
+①患者の(希望)や(自発性)から出発 ②基本的にマイナス面よりも(プラス)に注目する ③メンバーが(協力)して教え合い、互いの目標の実現をサポートする
+(アサーティブ): 相手も尊重した上で、(誠実)に、(率直)に、(対等)に、自分の要望や意見を相手に伝えること
+(任意入院) 精神障害者であり、入院が(必要)。(本人)の同意。(精神科医)
+(医療保護入院) 精神障害者であり、入院が必要であるが、(任意入院)が行われる状態にない。(家族等)本人の(配偶者)や(親権)を行う者等の同意。(精神保健指定医) ※特定医師の場合(12)時間以内有効
+(応急入院) 精神障害者であり、直ちに入院が必要で、入院が行われる状態にない。保護者の(同意)を得ることができない。(都道府県)が指定する(応急指定病院管理者)。(精神保健指定医) ※特定医師の場合(12)時間以内有効
+(措置入院) 精神障害者でありかつ(自傷他害)の恐れがある。(知事命令による行政処分)。(精神保健指定医2名以上)
+(緊急措置入院) 精神障害者でありかつ自傷他害の恐れがあり、(直ちに)入院が必要。(知事命令による行政処分)。(精神保健指定医1名以上)`;
+
+// 状態管理
+let questions = [];
+let currentIndex = 0;
+let correctTotalCount = 0;
+let isAnswerChecked = false; // 現在の問題が判定済みかどうか
+
+// 初期化処理：テキストから問題リストを生成
+function initQuiz() {
+    questions = [];
+    currentIndex = 0;
+    correctTotalCount = 0;
+    isAnswerChecked = false;
+
+    // 正規表現: ()で囲まれた部分を抽出（ネストされた括弧にも対応）
+    const regex = /\(([^()]+(?:\([^()]+\)[^()]*)*)\)/g;
+    const lines = rawText.split('\n');
+
+    lines.forEach(line => {
+        // 穴埋めがある行だけを問題として抽出
+        if (regex.test(line)) {
+            let answers = [];
+            let htmlText = line.replace(regex, (match, p1) => {
+                answers.push(p1.trim());
+                // インデックスを振ってIDを管理
+                return `<input type="text" class="quiz-input" data-index="${answers.length - 1}">`;
+            });
+            
+            questions.push({
+                originalText: line,
+                htmlText: htmlText,
+                answers: answers
+            });
+        }
+    });
+
+    document.getElementById('score-display').innerText = `正解数: 0`;
+    document.getElementById('reset-btn').style.display = 'none';
+    
+    displayQuestion();
+}
+
+// 現在の問題を画面に表示
+function displayQuestion() {
+    if (currentIndex >= questions.length) {
+        showResult();
+        return;
+    }
+
+    const q = questions[currentIndex];
+    
+    document.getElementById('progress').innerText = `問題: ${currentIndex + 1} / ${questions.length}`;
+    document.getElementById('question-text').innerHTML = q.htmlText;
+    document.getElementById('feedback').innerText = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('answer-display').style.display = 'none';
+    document.getElementById('answer-display').innerHTML = '';
+
+    document.getElementById('check-btn').style.display = 'inline-block';
+    document.getElementById('next-btn').style.display = 'none';
+
+    isAnswerChecked = false;
+    
+    // 最初の入力欄にフォーカス
+    const inputs = document.querySelectorAll('.quiz-input');
+    if (inputs.length > 0) {
+        inputs[0].focus();
+    }
+}
+
+// 正誤判定処理
+function checkAnswer() {
+    if (isAnswerChecked) return; // 既に判定済みの場合は何もしない
+    
+    const q = questions[currentIndex];
+    const inputs = document.querySelectorAll('.quiz-input');
+    let allCorrect = true;
+    let answerHtml = '<strong>正解:</strong><ul>';
+
+    inputs.forEach((input) => {
+        const index = parseInt(input.getAttribute('data-index'));
+        const userAnswer = input.value.trim();
+        const correctAnswer = q.answers[index];
+        
+        answerHtml += `<li>(${correctAnswer})</li>`;
+
+        input.disabled = true; // 判定後は入力不可にする
+
+        if (userAnswer === correctAnswer) {
+            input.classList.add('correct');
+        } else {
+            input.classList.add('incorrect');
+            allCorrect = false;
+        }
+    });
+    
+    answerHtml += '</ul>';
+    
+    const feedbackEl = document.getElementById('feedback');
+    if (allCorrect) {
+        feedbackEl.innerText = "正解！";
+        feedbackEl.className = 'feedback correct-msg';
+        correctTotalCount++;
+        document.getElementById('score-display').innerText = `正解数: ${correctTotalCount}`;
+    } else {
+        feedbackEl.innerText = "不正解...";
+        feedbackEl.className = 'feedback incorrect-msg';
+        
+        // 不正解があった場合のみ正解リストを表示する
+        const answerDisplay = document.getElementById('answer-display');
+        answerDisplay.innerHTML = answerHtml;
+        answerDisplay.style.display = 'block';
+    }
+
+    isAnswerChecked = true;
+    
+    // ボタンの切り替え
+    document.getElementById('check-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'inline-block';
+    document.getElementById('next-btn').focus(); // 次へボタンにフォーカスを移動
+}
+
+// 次の問題へ進む
+function nextQuestion() {
+    if (!isAnswerChecked) return;
+    currentIndex++;
+    displayQuestion();
+}
+
+// 全て終わった後の結果表示
+function showResult() {
+    document.getElementById('progress').innerText = '終了！';
+    document.getElementById('question-text').innerHTML = `
+        <div style="text-align: center; font-size: 1.5em; margin-top: 20px;">
+            全 ${questions.length} 問中、<br>
+            <span style="color: #e74c3c; font-size: 1.5em; font-weight: bold;">${correctTotalCount}</span> 問 正解しました！
+        </div>
+    `;
+    document.getElementById('feedback').innerText = '';
+    document.getElementById('answer-display').style.display = 'none';
+    
+    document.getElementById('check-btn').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('reset-btn').style.display = 'inline-block';
+}
+
+// Enterキーの制御 (入力欄では判定、判定後は次へ)
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        if (!isAnswerChecked) {
+            checkAnswer();
+        } else {
+            if (currentIndex < questions.length) {
+                nextQuestion();
+            }
+        }
+    }
+});
+
+// ページ読み込み時にクイズ開始
+window.onload = initQuiz;
+
+</script>
+</body>
+</html>
