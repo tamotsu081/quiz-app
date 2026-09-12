@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>急性期・脳神経看護 臨床知識○✖ドリル</title>
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-light: #3b82f6;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --correct-color: #10b981;
+            --incorrect-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-light);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: #f1f5f9;
+            border-left: 6px solid var(--primary-light);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .chapter-tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.8;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .btn-choice {
+            padding: 18px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-choice:hover:not(:disabled) {
+            border-color: var(--primary-light);
+            background: #eff6ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-circle { color: var(--correct-color); }
+        .btn-cross { color: var(--incorrect-color); }
+
+        .explanation-card {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .explanation-card.correct {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .explanation-card.incorrect {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .correct-text-box {
+            background: white;
+            padding: 14px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid var(--primary-light);
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .explanation-detail {
+            font-size: 0.95rem;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-light);
+        }
+
+        .final-score-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .final-score-card h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-light);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            .btn-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>急性期・脳神経看護 臨床知識○✖ドリル</h1>
+        <p>資料全7章対応｜再読み込みで○/✖判定と順序がシャッフルされます</p>
+    </header>
+
+    <div id="quiz-area">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="meta-info">
+            <span id="question-number">第 1 問 / 30 問</span>
+            <span id="score-counter">正解数: 0</span>
+        </div>
+
+        <div class="question-card">
+            <span class="chapter-tag" id="chapter-tag">第1章</span>
+            <div class="question-text" id="question-text">問題を読み込み中...</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-choice btn-circle" onclick="submitAnswer(true)">
+                <span>⭕ 正しい（○）</span>
+            </button>
+            <button class="btn-choice btn-cross" onclick="submitAnswer(false)">
+                <span>❌ 間違い（✖）</span>
+            </button>
+        </div>
+
+        <div class="explanation-card" id="explanation-card">
+            <div class="result-title" id="result-title"></div>
+            <div id="correct-text-container" style="display: none;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">【正確な文章（正文）】</div>
+                <div class="correct-text-box" id="correct-text"></div>
+            </div>
+            <div class="explanation-detail" id="explanation-detail"></div>
+        </div>
+
+        <button class="btn-action" id="next-btn" style="display: none;" onclick="nextQuestion()">次の問題へ ➡</button>
+    </div>
+
+    <div id="final-score-area" style="display: none;" class="final-score-card">
+        <h2>演習終了！</h2>
+        <p>全章の復習が完了しました。</p>
+        <div class="score-display" id="final-score">0 / 30</div>
+        <p id="final-comment" style="margin-bottom: 24px; color: var(--text-muted);"></p>
+        <button class="btn-action" onclick="restartQuiz()">問題をシャッフルして再挑戦 🔄</button>
+    </div>
+</div>
+
+<script>
+// 全7章のデータベース（正文・誤文・解説）
+const rawQuestionBank = [
+    // 第1章
+    {
+        chapter: "第1章：脳神経障害をもつ人の特徴",
+        correctText: "脳は生命の中枢（脳幹：中脳、橋、延髄、視床下部）であり、意識障害、呼吸障害、循環障害、体温調節障害など、生命に関わる機能の重篤な異常が起こりやすい。",
+        incorrectText: "脳は生命の中枢（脳幹：中脳、橋、延髄、視床下部）であり、意識障害、呼吸障害、循環障害、代謝調節障害など、生命に関わる機能の重篤な異常が起こりやすい。",
+        explanation: "脳幹障害では「代謝調節」ではなく「体温調節障害」が生命に関わる機能障害として現れます。"
+    },
+    {
+        chapter: "第1章：脳神経障害をもつ人の特徴",
+        correctText: "頭蓋内圧亢進・脳浮腫・脳血管攣縮を防ぐことで脳ヘルニアを防ぐ。高度になると脳ヘルニアや血管の再破裂へ進展する危険がある。",
+        incorrectText: "頭蓋内圧亢進・脳浮腫・脳血管攣縮を防ぐことで脳ヘルニアを防ぐ。高度になると正常圧水頭症や脳動脈瘤の新規形成へ進展する危険がある。",
+        explanation: "急性期の頭蓋内圧亢進や血管攣縮の高度化が直接もたらす生命的危機は「脳ヘルニア」や「血管の再破裂（再発）」です。"
+    },
+    {
+        chapter: "第1章：脳神経障害をもつ人の特徴",
+        correctText: "急性期の不適切なケアによる合併症として、嚥下障害に伴う誤嚥性肺炎、排泄障害に伴う尿路感染症、循環障害に伴う深部静脈血栓症などが起こる。",
+        incorrectText: "急性期の不適切なケアによる合併症として、嚥下障害に伴う尿路感染症、排泄障害に伴う深部静脈血栓症、循環障害に伴う誤嚥性肺炎などが起こる。",
+        explanation: "合併症の対応関係が誤っています（嚥下障害→誤嚥性肺炎、排泄障害→尿路感染症、循環障害→深部静脈血栓症）。"
+    },
+
+    // 第2章
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "脳梗塞は血管の狭窄や閉塞により血流が途絶え脳組織が障害される疾患であり、脳血管疾患の死亡原因の約60%を占める。",
+        incorrectText: "脳梗塞は血管の狭窄や閉塞により血流が途絶え脳組織が障害される疾患であり、脳血管疾患の死亡原因の約20%にとどまる。",
+        explanation: "脳梗塞は脳血管疾患による死亡原因の約60%（過半数以上）を占めます。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "一過性脳虚血発作（TIA）は一過性の血流障害により症状が出現するが、数分以内（長くても24時間以内）に完全に消失するものであり、脳梗塞の前駆発作として重要である。",
+        incorrectText: "一過性脳虚血発作（TIA）は一過性の血流障害により症状が出現するが、消失までに少なくとも3日以上を要し、脳出血の前駆発作として重要である。",
+        explanation: "TIAは数分以内（最長24時間以内）に完全消失し、「脳梗塞」の前駆発作として非常に重要です。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "中大脳動脈領域の血行障害では、意識障害、共同偏視、片麻痺、失語、失行、失認、半側空間無視などがみられる。",
+        incorrectText: "中大脳動脈領域の血行障害では、両側性運動麻痺、小脳失調、回転性めまい、嚥下障害が主症状となる。",
+        explanation: "両側性運動麻痺や小脳失調、めまいは椎骨脳底動脈系の障害でみられる症状です。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "後大脳動脈の支配領域は後頭葉であり、血行障害時には反対側の感覚障害、片麻痺、同名半盲、記憶障害、動眼神経麻痺を呈する。",
+        incorrectText: "後大脳動脈の支配領域は前頭葉であり、血行障害時には両側下肢の運動障害や尿失禁、精神機能低下を呈する。",
+        explanation: "後大脳動脈の支配領域は「後頭葉」です（前頭葉・脳梁は前大脳動脈領域）。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "心原性脳塞栓症は心房細動や心筋梗塞などを基礎疾患とし、心臓でできた血栓が流れて詰まる発生機序をもち、前駆症状（TIA）は少なく意識障害は重症化しやすい。",
+        incorrectText: "心原性脳塞栓症は高血圧や喫煙を主な基礎疾患とし、細い血管が詰まることで発生し、前駆症状（TIA）を頻繁に伴い意識障害は軽度にとどまる。",
+        explanation: "細い血管が詰まりTIAが少なく意識障害が軽度なのは「ラクナ梗塞」の特徴です。心原性脳塞栓症は重症化しやすいのが特徴です。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "脳梗塞発症直後のCTでは不明瞭であるが発症12〜24時間後に黒色の低吸収域として出現する。早期の診断にはMRIの拡散強調（DWI）画像が有効である。",
+        incorrectText: "脳梗塞発症直後のCTでは白く高吸収域として明確に出現するため、早期の診断においてMRI拡散強調（DWI）画像を行う必要はない。",
+        explanation: "直後のCTでは不明瞭（後に黒い低吸収域）であり、早期検出にはMRIのDWI画像が必須です（白い高吸収域は出血です）。"
+    },
+    {
+        chapter: "第2章：脳卒中の分類と脳梗塞",
+        correctText: "完全虚血領域の周囲に存在する不完全虚血領域をペナンブラと呼び、発症3〜4.5時間以内の迅速な治療により救命可能である。障害細胞からフリーラジカルが放出され、遅発性神経細胞死現象を引き起こす。",
+        incorrectText: "完全虚血領域の周囲に存在する不完全虚血領域をコアと呼び、発症24時間以降の治療により救命可能である。障害細胞からの血栓溶解酵素の放流により即時性神経幹細胞死を引き起こす。",
+        explanation: "不完全虚血領域は「ペナンブラ」であり、発症3〜4.5時間以内の治療が救命のカギとなります。また障害拡大の要因は「フリーラジカル放出による遅発性神経細胞死」です。"
+    },
+
+    // 第3章
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "頭蓋内腔は、脳実質（約80%）、脳脊髄液（約10%）、血液（約10%）の3要素で体積のバランスを保っており、正常頭蓋内圧は60〜180 mmH2Oである。",
+        incorrectText: "頭蓋内腔は、脳実質（約50%）、脳脊髄液（約25%）、血液（約25%）の3要素で体積のバランスを保っており、正常頭蓋内圧は300〜500 mmH2Oである。",
+        explanation: "脳実質約80%、脳脊髄液約10%、血液約10%であり、正常頭蓋内圧は60〜180 mmH2Oです。"
+    },
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "頭蓋内圧亢進の急性期にはクッシング現象（徐脈・血圧上昇）がみられ、慢性頭蓋内圧亢進の三徴は①頭痛 ②嘔吐 ③うっ血乳頭である。",
+        incorrectText: "頭蓋内圧亢進の急性期にはクッシング現象（頻脈・血圧低下）がみられ、慢性頭蓋内圧亢進の三徴は①発熱 ②下痢 ③項部硬直である。",
+        explanation: "クッシング現象は「徐脈・血圧上昇」であり、慢性三徴は「頭痛・嘔吐・うっ血乳頭」です。"
+    },
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "下行性（テント切痕）ヘルニアでは側頭葉内側部（鉤・海馬）が陥入し、動眼神経麻痺による病変側の瞳孔散大や、中脳圧迫による除脳硬直を呈する。",
+        incorrectText: "下行性（テント切痕）ヘルニアでは前頭葉が陥入し、三叉神経麻痺による病変側の瞳孔縮小や、延髄圧迫による急激な呼吸停止を呈する。",
+        explanation: "下行性ヘルニアは側頭葉内側部の陥入、動眼神経麻痺（病変側瞳孔散大）、中脳圧迫（除脳硬直）をきたします。"
+    },
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "大後頭孔（小脳扁桃）ヘルニアは、小脳扁桃が陥入して延髄を圧迫し、急激な意識障害、呼吸停止、項部硬直を引き起こす。",
+        incorrectText: "大後頭孔（小脳扁桃）ヘルニアは、大脳皮質が陥入して間脳を圧迫し、チェーンストークス呼吸と両側縮瞳のみを引き起こす。",
+        explanation: "小脳扁桃が延髄を圧迫するため、急激な意識障害や「呼吸停止」を起こす極めて危険なヘルニアです。"
+    },
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "静脈還流を促進し脳浮腫を軽減するための看護体位として、頭部を20〜30度挙上したセミファーラー位をとる。",
+        incorrectText: "静脈還流を促進し脳浮腫を軽減するための看護体位として、脳血流量を増やすため頭部を下げるトレンドレンブルグ位をとる。",
+        explanation: "頭蓋内圧・脳浮腫の軽減には頭部を20〜30度挙上する「セミファーラー位」が適切です。"
+    },
+    {
+        chapter: "第3章：頭蓋内圧亢進症と脳ヘルニア",
+        correctText: "除脳硬直は中脳・橋上の障害で起こり四肢が強く伸展し上肢の強い回内を伴う。除皮質硬直は大脳皮質の広範な障害で起こり上肢屈曲・内転位、下肢伸展位となる。",
+        incorrectText: "除脳硬直は大脳皮質の広範な障害で起こり上肢屈曲・内転位となり、除皮質硬直は中脳・橋上の障害で起こり四肢が強く伸展し上肢の強い回内を伴う。",
+        explanation: "除脳硬直（中脳・橋障害＝四肢強く伸展・上肢強い回内）と除皮質硬直（大脳皮質障害＝上肢屈曲・内転）の説明が逆になっています。"
+    },
+
+    // 第4章
+    {
+        chapter: "第4章：急性期脳梗塞の治療・看護と意識障害",
+        correctText: "急性期脳梗塞に対する血栓溶解療法（rt-PA静注療法）は、発症から4.5時間以内に投与を開始する必要がある。",
+        incorrectText: "急性期脳梗塞に対する血栓溶解療法（rt-PA静注療法）は、発症から24時間以内に投与を開始すればよい。",
+        explanation: "rt-PA静注療法の投与開始適応時間は「発症から4.5時間以内」です。"
+    },
+    {
+        chapter: "第4章：急性期脳梗塞の治療・看護と意識障害",
+        correctText: "急性期脳梗塞の管理では無理な降圧は行わず、廃用症候群や関節拘縮の予防として早期から他動的関節可動域（ROM）訓練を実施する。",
+        incorrectText: "急性期脳梗塞の管理では急速な強行降圧を最優先とし、関節拘縮予防のための運動療法は発症1ヶ月後まで厳重に禁止する。",
+        explanation: "急性期は虚血領域の血流維持のため無理な降圧は避け、拘縮予防のため早期から「他動的ROM訓練」を行います。"
+    },
+    {
+        chapter: "第4章：急性期脳梗塞の治療・看護と意識障害",
+        correctText: "脳死は全脳機能の不可逆的停止であり脳幹機能も停止し自発呼吸がないのに対し、植物状態（遷延性意識障害）は脳幹機能が残存しており自発呼吸が可能である。",
+        incorrectText: "脳死は脳幹機能が残存しており自発呼吸が可能であるのに対し、植物状態（遷延性意識障害）は全脳機能および脳幹機能の不可逆的停止であり自発呼吸がない。",
+        explanation: "脳死は「脳幹機能も停止・自発呼吸なし」、植物状態は「脳幹機能残存・自発呼吸可能」です。"
+    },
+
+    // 第5章
+    {
+        chapter: "第5章：脳出血とくも膜下出血",
+        correctText: "脳出血の部位別特徴において、被殻出血（40〜50%）では片麻痺、感覚障害、失語症、半盲がみられ、視床出血（30%）では片麻痺、感覚障害、失語症のほか眼瞼下垂や視床痛がみられる。",
+        incorrectText: "脳出血の部位別特徴において、被殻出血では小脳失調と回転性めまいのみが起こり、視床出血では四肢麻痺と急激な呼吸停止をきたす。",
+        explanation: "被殻出血は片麻痺・感覚障害・失語・半盲、視床出血は片麻痺・感覚障害・失語・眼瞼下垂・視床痛が特徴です。"
+    },
+    {
+        chapter: "第5章：脳出血とくも膜下出血",
+        correctText: "くも膜下出血（SAH）の原因として、脳動脈瘤の破裂は40〜60代の女性に好発し、脳動静脈奇形（AVM）は20〜40代の男性に好発する。",
+        incorrectText: "くも膜下出血（SAH）の原因として、脳動脈瘤の破裂は20〜40代の男性に好発し、脳動静脈奇形（AVM）は40〜60代の女性に好発する。",
+        explanation: "好発年齢・性別が逆になっています（動脈瘤破裂＝40〜60代女性、AVM＝20〜40代男性）。"
+    },
+    {
+        chapter: "第5章：脳出血とくも膜下出血",
+        correctText: "くも膜下出血の発症時には突然の激しい頭痛、嘔吐、意識消失などが起こり、髄膜刺激症状（頸部硬直、ケルニッヒサイン、ブルジンスキーサイン）を呈する。CTではくも膜下腔に白い高吸収域がヒトデ型に広がる。",
+        incorrectText: "くも膜下出血の発症時には徐々に進行する微熱と貧血のみが起こる。CTではくも膜下腔に黒い低吸収域が三日月型に広がるのが特徴である。",
+        explanation: "SAHは「突然の激しい頭痛」「髄膜刺激症状」、CTで「白い高吸収域がヒトデ型」に広がるのが典型的です。"
+    },
+    {
+        chapter: "第5章：脳出血とくも膜下出血",
+        correctText: "くも膜下出血の3大合併症と発生時期は、①再出血（発症24時間以内の急性期）、②脳血管攣縮（発症72時間〜2週間・ピーク8〜10日目の亜急性期）、③正常圧水頭症（発症数週間〜数ヶ月の慢性期）である。",
+        incorrectText: "くも膜下出血の3大合併症と発生時期は、①脳血管攣縮（発症24時間以内）、②正常圧水頭症（発症72時間〜2週間）、③再出血（発症数週間〜数ヶ月）である。",
+        explanation: "3大合併症の発生時期：再出血（24時間以内）、脳血管攣縮（72時間〜2週間）、正常圧水頭症（数週間〜数ヶ月）です。"
+    },
+
+    // 第6章
+    {
+        chapter: "第6章：脳室ドレナージ・シャント術の看護",
+        correctText: "脳室ドレナージの管理では、設定圧のゼロ点を外耳孔の高さに合わせ、ドレナージ回路の液面が心拍に同期して拍動していることを確認する。",
+        incorrectText: "脳室ドレナージの管理では、設定圧のゼロ点を胸骨角の高さに合わせ、ドレナージ回路の液面が自発呼吸に同期して拍動していることを確認する。",
+        explanation: "脳室ドレナージのゼロ点は「外耳孔の高さ」であり、液面は「心拍に同期」して拍動します。"
+    },
+    {
+        chapter: "第6章：脳室ドレナージ・シャント術の看護",
+        correctText: "脳室ドレナージ管理において、エアフィルターが濡れた場合はシステムの感染やドレナージ不良を防ぐためにシステム交換が必要となる。",
+        incorrectText: "脳室ドレナージ管理において、エアフィルターが濡れた場合は乾燥させればそのまま継続使用してよい。",
+        explanation: "エアフィルターが濡れると閉塞や感染のリスクが高まるため、「システム交換」が必要です。"
+    },
+    {
+        chapter: "第6章：脳室ドレナージ・シャント術の看護",
+        correctText: "脳室ドレナージ患者の体位変換時のクランプ順序は、患者側のクランプから順に閉鎖し、処置終了後は遠位側から開放する。",
+        incorrectText: "脳室ドレナージ患者の体位変換時のクランプ順序は、遠位側のクランプから順に閉鎖し、処置終了後は患者側から開放する。",
+        explanation: "髄液の逆流や急激な流出を防ぐため「患者側から順に閉鎖、処置後は遠位側から開放」します。"
+    },
+    {
+        chapter: "第6章：脳室ドレナージ・シャント術の看護",
+        correctText: "シャント術（V-Pシャント等）で腹腔内へ流入した髄液は腹膜から吸収される。注意すべき合併症としてシャント不全、感染があり、磁気バルブへの影響を防ぐためMRI検査や磁気製品の近接に注意する。",
+        incorrectText: "シャント術で腹腔内へ流入した髄液は腎臓から尿として直接排泄される。磁気バルブは完全防水耐磁性であるためMRI検査や磁気製品の近接制限は一切不要である。",
+        explanation: "髄液は「腹膜から吸収」されます。またプログラマブルバルブは磁気の影響を受けるためMRIや磁気製品の近接に注意が必要です。"
+    },
+
+    // 第7章
+    {
+        chapter: "第7章：脳血管内治療とその看護",
+        correctText: "脳血管内治療の適応として、くも膜下出血へのコイル塞栓術、アテローム血栓性脳梗塞への頸動脈ステント留置術、心原性脳塞栓症への血栓回収療法などがある。",
+        incorrectText: "脳血管内治療の適応として、くも膜下出血への開頭クリッピング術、アテローム血栓性脳梗塞への開頭減圧術、心原性脳塞栓症へのV-Pシャント術が行われる。",
+        explanation: "提示されているのはいずれも開頭手術等であり、「血管内治療（カテーテル治療）」の記述として誤りです。"
+    },
+    {
+        chapter: "第7章：脳血管内治療とその看護",
+        correctText: "脳血管内治療における造影剤使用時には、副作用（呼吸困難、発疹）の観察とともに排泄状態確認のため尿比重を測定する。尿比重の正常値は1.010〜1.030である。",
+        incorrectText: "脳血管内治療における造影剤使用時には、副作用の観察とともに尿比重を測定するが、尿比重の正常値は1.050〜1.080である。",
+        explanation: "尿比重の正常値は「1.010〜1.030」です。"
+    },
+    {
+        chapter: "第7章：脳血管内治療とその看護",
+        correctText: "脳血管内治療周術期において、穿刺部位の疼痛や緊張により迷走神経反射が誘発されると、徐脈および血圧低下を起こすため早期発見に努める。",
+        incorrectText: "脳血管内治療周術期において、穿刺部位の疼痛や緊張により迷走神経反射が誘発されると、頻脈および血圧上昇を起こすため早期発見に努める。",
+        explanation: "迷走神経反射は副交感神経が優位となるため、「徐脈・血圧低下」を引き起こします。"
+    }
+];
+
+let generatedQuizData = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let answered = false;
+
+// 配列シャッフル関数 (Fisher-Yates)
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// クイズ初期化：問題順序をシャッフルし、各問の「正文/誤文」提示を50%の確率でランダム決定
+function initQuiz() {
+    const shuffledRaw = shuffleArray(rawQuestionBank);
+    generatedQuizData = shuffledRaw.map((q, idx) => {
+        const isTrueStatement = Math.random() < 0.5; // 50%の確率で○か✖かをランダム決定
+        return {
+            id: idx + 1,
+            chapter: q.chapter,
+            displayText: isTrueStatement ? q.correctText : q.incorrectText,
+            isCorrectAnswer: isTrueStatement, // 正文なら○(true)が正解、誤文なら✖(false)が正解
+            correctText: q.correctText,
+            explanation: q.explanation
+        };
+    });
+
+    currentQuestionIndex = 0;
+    score = 0;
+    document.getElementById("quiz-area").style.display = "block";
+    document.getElementById("final-score-area").style.display = "none";
+    showQuestion();
+}
+
+// 問題表示
+function showQuestion() {
+    answered = false;
+    const q = generatedQuizData[currentQuestionIndex];
+    
+    document.getElementById("chapter-tag").innerText = q.chapter;
+    document.getElementById("question-text").innerText = q.displayText;
+    document.getElementById("question-number").innerText = `第 ${currentQuestionIndex + 1} 問 / ${generatedQuizData.length} 問`;
+    document.getElementById("score-counter").innerText = `正解数: ${score}`;
+    
+    // 進捗バー
+    const progressPercent = ((currentQuestionIndex) / generatedQuizData.length) * 100;
+    document.getElementById("progress-bar").style.width = `${progressPercent}%`;
+
+    // UIリセット
+    document.getElementById("explanation-card").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+    
+    const choiceBtns = document.querySelectorAll(".btn-choice");
+    choiceBtns.forEach(btn => btn.disabled = false);
+}
+
+// 回答処理
+function submitAnswer(userChoice) {
+    if (answered) return;
+    answered = true;
+
+    const q = generatedQuizData[currentQuestionIndex];
+    const isUserCorrect = (userChoice === q.isCorrectAnswer);
+
+    const choiceBtns = document.querySelectorAll(".btn-choice");
+    choiceBtns.forEach(btn => btn.disabled = true);
+
+    const expCard = document.getElementById("explanation-card");
+    const resultTitle = document.getElementById("result-title");
+    const correctTextContainer = document.getElementById("correct-text-container");
+    const correctTextDiv = document.getElementById("correct-text");
+    const expDetail = document.getElementById("explanation-detail");
+
+    expCard.style.display = "block";
+
+    if (isUserCorrect) {
+        score++;
+        document.getElementById("score-counter").innerText = `正解数: ${score}`;
+        expCard.className = "explanation-card correct";
+        resultTitle.innerHTML = `⭕ 正解！ <span style="font-size:0.95rem; font-weight:normal;">(${q.isCorrectAnswer ? 'この文章は正しいです' : 'この文章は誤りです'})</span>`;
+    } else {
+        expCard.className = "explanation-card incorrect";
+        resultTitle.innerHTML = `❌ 不正解... <span style="font-size:0.95rem; font-weight:normal;">(${q.isCorrectAnswer ? '正解は「正しい（○）」でした' : '正解は「間違い（✖）」でした'})</span>`;
+    }
+
+    // 提示した文章が誤文だった場合、あるいは不正解だった場合には「正確な文章」を強調表示
+    if (!q.isCorrectAnswer || !isUserCorrect) {
+        correctTextContainer.style.display = "block";
+        correctTextDiv.innerText = q.correctText;
+    } else {
+        correctTextContainer.style.display = "none";
+    }
+
+    expDetail.innerText = "💡 解説・臨床ポイント： " + q.explanation;
+    document.getElementById("next-btn").style.display = "block";
+}
+
+// 次の問題へ
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < generatedQuizData.length) {
+        showQuestion();
+    } else {
+        showFinalScore();
+    }
+}
+
+// 最終スコア画面
+function showFinalScore() {
+    document.getElementById("quiz-area").style.display = "none";
+    const finalScoreArea = document.getElementById("final-score-area");
+    finalScoreArea.style.display = "block";
+    
+    const total = generatedQuizData.length;
+    document.getElementById("final-score").innerText = `${score} / ${total} 問`;
+
+    const percentage = (score / total) * 100;
+    let comment = "";
+    if (percentage === 100) {
+        comment = "素晴らしい！急性期脳神経看護の全知識が完璧に頭に入っています！";
+    } else if (percentage >= 80) {
+        comment = "合格ラインです！間違えた箇所の【正文】をしっかり見直して完璧を目指しましょう。";
+    } else {
+        comment = "繰り返し挑戦して、精緻な間違いを見抜ける臨床知識を定着させましょう！";
+    }
+    document.getElementById("final-comment").innerText = comment;
+}
+
+// やり直し（全シャッフルして再スタート）
+function restartQuiz() {
+    initQuiz();
+}
+
+// ページ読み込み時にクイズ開始
+window.onload = initQuiz;
+</script>
+</body>
+</html>
