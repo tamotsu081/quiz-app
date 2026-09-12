@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>胆嚢・胆管系疾患 看護ドリル</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .container {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        max-width: 800px;
+        width: 100%;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        text-align: center;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+    .progress {
+        font-weight: bold;
+        color: #7f8c8d;
+        margin-bottom: 15px;
+    }
+    .question-text {
+        font-size: 1.2rem;
+        margin-bottom: 25px;
+        line-height: 2;
+    }
+    select {
+        font-size: 1rem;
+        padding: 5px;
+        margin: 0 5px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        cursor: pointer;
+    }
+    select:focus {
+        outline: none;
+        border-color: #3498db;
+        background-color: #eaf2f8;
+    }
+    .btn {
+        display: inline-block;
+        background-color: #3498db;
+        color: #fff;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .btn:hover {
+        background-color: #2980b9;
+    }
+    .btn:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+    #result-area {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        display: none;
+    }
+    .correct {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .incorrect {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .answer-text {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+    .next-btn-container {
+        margin-top: 20px;
+        text-align: right;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>第4回 胆嚢・胆管系疾患のある人の看護</h1>
+    <div class="progress" id="progress">問題 1 / 32</div>
+    <div class="question-text" id="question-text"></div>
+    
+    <button class="btn" id="submit-btn" onclick="checkAnswer()">解答する</button>
+    
+    <div id="result-area">
+        <div id="result-message"></div>
+        <div id="correct-answer" class="answer-text"></div>
+        <div class="next-btn-container">
+            <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none;">次の問題へ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        text: "血液中のビリルビン濃度が高くなった状態。総ビリルビン値(T-Bil値)が {0} 以上になると眼球結膜が黄染し、 {1} になると胸部・腹部の皮膚の黄染がみられるようになる。",
+        type: "ordered",
+        holes: [
+            { correct: "2mg/dL", options: ["1mg/dL", "2mg/dL", "3～5mg/dL", "5～10mg/dL"] },
+            { correct: "3～5mg/dL", options: ["1mg/dL", "2mg/dL", "3～5mg/dL", "10mg/dL"] }
+        ]
+    },
+    {
+        text: "黄疸の分類とメカニズム：①肝前性黄疸は {0} が上昇する。",
+        type: "ordered",
+        holes: [{ correct: "間接ビリルビン値", options: ["間接ビリルビン値", "直接ビリルビン値", "総ビリルビン値", "ウロビリノーゲン値"] }]
+    },
+    {
+        text: "黄疸の分類とメカニズム：②肝細胞性黄疸は {0} と {1} が上昇する。",
+        type: "unordered",
+        corrects: ["間接ビリルビン値", "直接ビリルビン値"],
+        options: ["間接ビリルビン値", "直接ビリルビン値", "総ビリルビン値", "ウロビリノーゲン値", "ステルコビリン値"]
+    },
+    {
+        text: "黄疸の分類とメカニズム：③肝後性黄疸は {0} が上昇する。",
+        type: "ordered",
+        holes: [{ correct: "直接ビリルビン", options: ["直接ビリルビン", "間接ビリルビン", "ウロビリノーゲン", "ステルコビリン"] }]
+    },
+    {
+        text: "肝前性黄疸の代表的なものは、溶血性貧血による {0} である。",
+        type: "ordered",
+        holes: [{ correct: "溶血性黄疸", options: ["溶血性黄疸", "閉塞性黄疸", "肝実質性黄疸", "体質性黄疸"] }]
+    },
+    {
+        text: "肝後性黄疸は {0} ともいう。",
+        type: "ordered",
+        holes: [{ correct: "閉塞性黄疸", options: ["閉塞性黄疸", "溶血性黄疸", "肝細胞性黄疸", "新生児黄疸"] }]
+    },
+    {
+        text: "便通の調整：胆汁排泄の障害により、 {0} が低下しやすい。",
+        type: "ordered",
+        holes: [{ correct: "腸蠕動", options: ["腸蠕動", "胃排出能", "門脈圧", "腸管吸収"] }]
+    },
+    {
+        text: "掻痒感の緩和：ビリルビンの組織への沈着が {0} となり、掻痒感を生じさせる。",
+        type: "ordered",
+        holes: [{ correct: "皮膚の神経終末への刺激", options: ["皮膚の神経終末への刺激", "肥満細胞からのヒスタミン遊離", "真皮の炎症細胞浸潤", "表皮の乾燥状態悪化"] }]
+    },
+    {
+        text: "胆石が生じた部位により肝内結石、 {0} 、 {1} という。",
+        type: "unordered",
+        corrects: ["胆嚢結石", "総胆管結石"],
+        options: ["胆嚢結石", "総胆管結石", "胆嚢管結石", "膵管結石", "肝外胆管結石", "ファーター乳頭結石"]
+    },
+    {
+        text: "最も多い胆石は、 {0} である。",
+        type: "ordered",
+        holes: [{ correct: "コレステロール胆石", options: ["コレステロール胆石", "ビリルビンカルシウム結石", "黒色石", "脂肪酸カルシウム結石"] }]
+    },
+    {
+        text: "総胆管結石に多いのは、 {0} である。",
+        type: "ordered",
+        holes: [{ correct: "色素結石", options: ["色素結石", "コレステロール胆石", "炭酸カルシウム結石", "混合石"] }]
+    },
+    {
+        text: "胆石の3主徴： {0} 、 {1} 、 {2} ",
+        type: "unordered",
+        corrects: ["右季肋部痛", "発熱", "黄疸"],
+        options: ["右季肋部痛", "発熱", "黄疸", "悪心", "嘔吐", "背部痛", "意識障害", "ショック", "灰白色便", "肝腫大"]
+    },
+    {
+        text: "胆嚢炎の痛みの特徴：疝痛発作は {0} にわたって続く。",
+        type: "ordered",
+        holes: [{ correct: "15～60分をピークに6～12時間", options: ["15～60分をピークに6～12時間", "5～10分をピークに1～2時間", "1～2時間をピークに24～48時間", "数日間にわたり持続的"] }]
+    },
+    {
+        text: "胆管炎が重症化するとシャルコーの3主徴という {0} 、 {1} 、 {2} や、これに意識障害とショックが加わったレイノルズ5徴などがおこる。",
+        type: "unordered",
+        corrects: ["発熱", "腹痛", "黄疸"],
+        options: ["発熱", "腹痛", "黄疸", "悪寒", "意識障害", "ショック", "嘔吐", "下痢", "背部放散痛", "痙攣"]
+    },
+    {
+        text: "ERCPやESTの合併症である膵炎では、 {0} の上昇に注意する。",
+        type: "ordered",
+        holes: [{ correct: "アミラーゼ値(AMY)", options: ["アミラーゼ値(AMY)", "リパーゼ値", "AST/ALT値", "ALP/γ-GTP値"] }]
+    },
+    {
+        text: "胆石症の食事療法：炎症が強い場合は、 {0} とし、グルコース、電解質などの補液を行う。",
+        type: "ordered",
+        holes: [{ correct: "絶飲食", options: ["絶飲食", "経腸栄養", "低脂肪食", "流動食"] }]
+    },
+    {
+        text: "腹腔鏡下胆嚢摘出術(Lap-C)の合併症：一般的な手術合併症に加え、気腹による無気肺・皮下気腫、 {0} などがある。",
+        type: "ordered",
+        holes: [{ correct: "胆汁漏", options: ["胆汁漏", "膵液漏", "術後イレウス", "門脈血栓"] }]
+    },
+    {
+        text: "症状出現時の看護：疝痛発作時には {0} をとり、それでも軽快しないときは {1} で膝の下に枕を入れて、膝を軽く曲げ上腹部に圧迫を加えないようにする。",
+        type: "ordered",
+        holes: [
+            { correct: "ファウラー位", options: ["ファウラー位", "側臥位", "トレンデレンブルグ位", "半坐位"] },
+            { correct: "仰臥位", options: ["仰臥位", "腹臥位", "シムス位", "砕石位"] }
+        ]
+    },
+    {
+        text: "食事をとると、 {0} が分泌され、胆嚢の収縮が起こる。これを防ぐために {1} とします。",
+        type: "ordered",
+        holes: [
+            { correct: "コレシストキニン", options: ["コレシストキニン", "セクレチン", "ガストリン", "ソマトスタチン"] },
+            { correct: "絶食", options: ["絶食", "流動食", "低残渣食", "胃洗浄"] }
+        ]
+    },
+    {
+        text: "内視鏡的検査及び治療の事前準備：医師から説明があった場合は、 {0} を確認する。",
+        type: "ordered",
+        holes: [{ correct: "説明後の患者の理解度", options: ["説明後の患者の理解度", "同意書の署名の有無", "家族の同席の有無", "医師のインフォームドコンセントの適切さ"] }]
+    },
+    {
+        text: "検査(治療)前日の21時より、 {0} とし、当日6時より {1} とします。",
+        type: "ordered",
+        holes: [
+            { correct: "絶食", options: ["絶食", "絶飲食", "流動食", "制限なし"] },
+            { correct: "絶飲食", options: ["絶飲食", "絶食", "飲水可", "制限なし"] }
+        ]
+    },
+    {
+        text: "逆行性に造影剤を注入するため、急性膵炎を生じやすい。検査終了2時間後に採血を行い、 {0} の確認をする。",
+        type: "ordered",
+        holes: [{ correct: "血清アミラーゼ値", options: ["血清アミラーゼ値", "血清ビリルビン値", "白血球数", "CRP値"] }]
+    },
+    {
+        text: "検査終了後2時間は、造影剤の排泄の促進と膵炎予防のため、 {0} とし、症状安静とする。",
+        type: "ordered",
+        holes: [{ correct: "右側臥位", options: ["右側臥位", "左側臥位", "仰臥位", "ファウラー位"] }]
+    },
+    {
+        text: "胆汁ドレナージの場合の注意点：チューブの {0} 、 {1} 、 {2} に注意し、抜けないようしっかり固定する。",
+        type: "unordered",
+        corrects: ["屈曲", "圧迫", "捻転"],
+        options: ["屈曲", "圧迫", "捻転", "伸展", "抜去", "閉塞", "逆流", "感染", "断裂", "癒着"]
+    },
+    {
+        text: "チューブの閉塞を防ぐために {0} を行う。",
+        type: "ordered",
+        holes: [{ correct: "ミルキング", options: ["ミルキング", "フラッシング", "クランプ", "持続吸引"] }]
+    },
+    {
+        text: "逆流防止のため、排液バックは必ず肝臓の高さよりも {0} 保つ。",
+        type: "ordered",
+        holes: [{ correct: "低く", options: ["低く", "高く", "同じ高さに", "水平に"] }]
+    },
+    {
+        text: "胆汁の体外への過剰排泄によって起こる電解質異常(低カリウム血症)に注意し、排液の {0} を観察する。",
+        type: "ordered",
+        holes: [{ correct: "量と性状", options: ["量と性状", "色調と臭気", "比重とpH", "混濁と沈殿"] }]
+    },
+    {
+        text: "胆汁ドレナージ中の観察項目：発熱、腹痛、黄疸、 {0} 等を観察する。",
+        type: "ordered",
+        holes: [{ correct: "尿・便の色", options: ["尿・便の色", "吐物の性状", "呼吸状態", "意識レベル"] }]
+    },
+    {
+        text: "疾病コントロールとしての食事・生活指導： {0} とし、バランスの良い食事を心がける。",
+        type: "ordered",
+        holes: [{ correct: "低脂肪食", options: ["低脂肪食", "低残渣食", "低タンパク食", "高カロリー食"] }]
+    },
+    {
+        text: "脂質調整の目安は、1日 {0} を上限とする。",
+        type: "ordered",
+        holes: [{ correct: "30g", options: ["30g", "50g", "10g", "70g"] }]
+    },
+    {
+        text: " {0} や香辛料などの刺激物、 {1} は、胆嚢の収縮を促進するため、控える。",
+        type: "unordered",
+        corrects: ["カフェイン", "アルコール"],
+        options: ["カフェイン", "アルコール", "ニコチン", "炭酸", "塩分", "糖分", "食物繊維"]
+    },
+    {
+        text: "手術療法を受けた患者の看護：便が {0} に傾きやすいため、脂肪を控えた食事を心がけ、咀嚼回数を増やすなど、消化・吸収を助ける食事摂取方法を指導する。",
+        type: "ordered",
+        holes: [{ correct: "軟便や下痢", options: ["軟便や下痢", "便秘", "脂肪便", "黒色便"] }]
+    }
+];
+
+let currentIndex = 0;
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function loadQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById("progress").textContent = `問題 ${currentIndex + 1} / ${questions.length}`;
+    
+    let htmlText = q.text;
+    
+    if (q.type === "ordered") {
+        q.holes.forEach((hole, index) => {
+            let selectHtml = `<select id="hole-${index}"><option value="">選択してください</option>`;
+            let opts = shuffle([...hole.options]);
+            opts.forEach(opt => {
+                selectHtml += `<option value="${opt}">${opt}</option>`;
+            });
+            selectHtml += `</select>`;
+            htmlText = htmlText.replace(`{${index}}`, selectHtml);
+        });
+    } else if (q.type === "unordered") {
+        let opts = shuffle([...q.options]);
+        q.corrects.forEach((correct, index) => {
+            let selectHtml = `<select id="hole-${index}"><option value="">選択してください</option>`;
+            opts.forEach(opt => {
+                selectHtml += `<option value="${opt}">${opt}</option>`;
+            });
+            selectHtml += `</select>`;
+            htmlText = htmlText.replace(`{${index}}`, selectHtml);
+        });
+    }
+    
+    document.getElementById("question-text").innerHTML = htmlText;
+    
+    // Reset UI
+    document.getElementById("result-area").style.display = "none";
+    document.getElementById("submit-btn").style.display = "inline-block";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer() {
+    const q = questions[currentIndex];
+    let isCorrect = true;
+    let numHoles = q.type === "ordered" ? q.holes.length : q.corrects.length;
+    let userAnswers = [];
+    
+    // Validate all selected
+    for(let i=0; i<numHoles; i++) {
+        let val = document.getElementById(`hole-${i}`).value;
+        if(!val) {
+            alert("すべての空欄を選択してください。");
+            return;
+        }
+        userAnswers.push(val);
+    }
+    
+    let correctAnswersText = "";
+
+    if (q.type === "ordered") {
+        for(let i=0; i<numHoles; i++) {
+            if(userAnswers[i] !== q.holes[i].correct) {
+                isCorrect = false;
+            }
+        }
+        correctAnswersText = q.holes.map(h => h.correct).join("、");
+    } else if (q.type === "unordered") {
+        let sortedUser = [...userAnswers].sort();
+        let sortedCorrect = [...q.corrects].sort();
+        
+        // 順不同の場合は、選んだ要素が重複していないか（同じものを2つ選んでいないか）チェック
+        let uniqueUserAnswers = new Set(userAnswers);
+        if(uniqueUserAnswers.size !== userAnswers.length) {
+            isCorrect = false;
+        } else {
+            for(let i=0; i<sortedUser.length; i++) {
+                if(sortedUser[i] !== sortedCorrect[i]) isCorrect = false;
+            }
+        }
+        correctAnswersText = q.corrects.join("、");
+    }
+
+    const resultArea = document.getElementById("result-area");
+    const resultMessage = document.getElementById("result-message");
+    const correctAnswerDiv = document.getElementById("correct-answer");
+    
+    resultArea.style.display = "block";
+    resultArea.className = isCorrect ? "correct" : "incorrect";
+    
+    if(isCorrect) {
+        resultMessage.innerHTML = "<h3>⭕ 正解！</h3>";
+        correctAnswerDiv.innerHTML = "";
+    } else {
+        resultMessage.innerHTML = "<h3>❌ 不正解...</h3>";
+        correctAnswerDiv.innerHTML = `正解は <strong>${correctAnswersText}</strong> です。`;
+    }
+    
+    document.getElementById("submit-btn").style.display = "none";
+    
+    if (currentIndex < questions.length - 1) {
+        document.getElementById("next-btn").style.display = "inline-block";
+        document.getElementById("next-btn").textContent = "次の問題へ";
+    } else {
+        document.getElementById("next-btn").style.display = "inline-block";
+        document.getElementById("next-btn").textContent = "最初からやり直す";
+    }
+    
+    // 選択肢をロックする
+    for(let i=0; i<numHoles; i++) {
+        document.getElementById(`hole-${i}`).disabled = true;
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+        currentIndex++;
+    } else {
+        currentIndex = 0; // Reset
+    }
+    loadQuestion();
+}
+
+// 初期読み込み
+window.onload = loadQuestion;
+</script>
+</body>
+</html>
