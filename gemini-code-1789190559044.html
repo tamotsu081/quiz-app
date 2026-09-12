@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>肝機能障害のある人の看護② ドリル</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        background-color: #f0f4f8;
+        color: #2c3e50;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+        max-width: 800px;
+        width: 100%;
+        padding: 40px;
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 1.6rem;
+        color: #34495e;
+        text-align: center;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+    }
+    .progress {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #7f8c8d;
+        margin-bottom: 20px;
+        text-align: right;
+    }
+    .question-text {
+        font-size: 1.25rem;
+        margin-bottom: 30px;
+        line-height: 2.2;
+    }
+    select {
+        font-size: 1.1rem;
+        padding: 8px;
+        margin: 0 5px;
+        border-radius: 6px;
+        border: 2px solid #bdc3c7;
+        background-color: #fafafa;
+        cursor: pointer;
+        color: #2c3e50;
+        font-weight: bold;
+    }
+    select:focus {
+        outline: none;
+        border-color: #3498db;
+        background-color: #eaf2f8;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        background-color: #3498db;
+        color: #fff;
+        padding: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+    .btn:hover {
+        background-color: #2980b9;
+    }
+    .btn:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+    }
+    #result-area {
+        margin-top: 30px;
+        padding: 20px;
+        border-radius: 8px;
+        display: none;
+        text-align: center;
+    }
+    .correct {
+        background-color: #d5f5e3;
+        color: #27ae60;
+        border: 2px solid #abebc6;
+    }
+    .incorrect {
+        background-color: #fadbd8;
+        color: #c0392b;
+        border: 2px solid #f5b7b1;
+    }
+    .result-heading {
+        font-size: 1.5rem;
+        margin: 0 0 10px 0;
+    }
+    .answer-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .citation {
+        font-size: 0.85rem;
+        color: #95a5a6;
+        vertical-align: super;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>肝機能障害のある人の看護② ドリル</h1>
+    <div class="progress" id="progress"></div>
+    <div class="question-text" id="question-text"></div>
+    
+    <button class="btn" id="submit-btn" onclick="checkAnswer()">解答する</button>
+    
+    <div id="result-area">
+        <h3 class="result-heading" id="result-message"></h3>
+        <div id="correct-answer" class="answer-text"></div>
+        <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none;"></button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        text: "急性肝炎患者の看護のポイント① 自覚症状が乏しくても、肝細胞の再生・修復のために {0} や {1} が必要な状態。<span class='citation'>[cite: 8]</span>",
+        type: "unordered",
+        corrects: ["安静", "食事療法"],
+        options: ["安静", "食事療法", "運動療法", "早期離床", "絶飲食", "中心静脈栄養"]
+    },
+    {
+        text: "ウイルスキャリアとして正しい知識が必要な状態 → 薬物療法（ {0} ・ {1} ）への看護と感染予防を中心とした指導。<span class='citation'>[cite: 8]</span>",
+        type: "unordered",
+        corrects: ["インターフェロン製剤", "抗ウイルス薬"],
+        options: ["インターフェロン製剤", "抗ウイルス薬", "抗菌薬", "副腎皮質ステロイド", "免疫抑制薬", "分岐鎖アミノ酸製剤"]
+    },
+    {
+        text: "肝機能データ： {0} 、 {1} 血清アミノトランスフェラーゼの増加。<span class='citation'>[cite: 8]</span>",
+        type: "unordered",
+        corrects: ["AST", "ALT"],
+        options: ["AST", "ALT", "ALP", "γ-GTP", "総ビリルビン", "直接ビリルビン"]
+    },
+    {
+        text: "検査データ 栄養状態： {0} <span class='citation'>[cite: 8]</span>",
+        type: "single",
+        correct: "Alb, T-P",
+        options: ["Alb, T-P", "BUN, Cr", "PT, APTT", "ChE, T-Cho"]
+    },
+    {
+        text: "肝性脳症の徴候 第2期： {0} 、 {1} 、 {2} 、 {3} などの状態を確認する。<span class='citation'>[cite: 8]</span>",
+        type: "unordered",
+        corrects: ["尿量減少", "肝性口臭", "羽ばたき振戦", "排便の状況"],
+        options: ["尿量減少", "肝性口臭", "羽ばたき振戦", "排便の状況", "傾眠傾向", "異常行動", "見当識障害", "昏睡", "構音障害", "固縮"]
+    },
+    {
+        text: "急性肝炎の食事療法：黄疸のある患者は {0} とし、禁酒する。<span class='citation'>[cite: 8]</span>",
+        type: "single",
+        correct: "低脂肪食",
+        options: ["低脂肪食", "低タンパク食", "低残渣食", "高タンパク食"]
+    },
+    {
+        text: "感染拡大への予防：患者の家族やパートナーに対して、感染防止策を指導。 {0} 接種。<span class='citation'>[cite: 8]</span>",
+        type: "single",
+        correct: "HBVワクチン",
+        options: ["HBVワクチン", "HCVワクチン", "HAVワクチン", "免疫グロブリン"]
+    },
+    {
+        text: "B型肝炎のセルフケア：かみそり、出血時の手当て、性交渉時 {0} の使用。<span class='citation'>[cite: 8]</span>",
+        type: "single",
+        correct: "コンドーム",
+        options: ["コンドーム", "経口避妊薬", "殺精子剤", "子宮内避妊器具"]
+    },
+    {
+        text: "慢性肝炎の病態：肝実質内に種々の肝細胞の {0} ・ {1} 所見が見られる。<span class='citation'>[cite: 8]</span>",
+        type: "unordered",
+        corrects: ["変性", "壊死"],
+        options: ["変性", "壊死", "線維化", "結節形成", "脂肪化", "癌化"]
+    }
+];
+
+let currentIndex = 0;
+
+function shuffle(array) {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+function loadQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById("progress").textContent = `問題 ${currentIndex + 1} / ${questions.length}`;
+    
+    let htmlText = q.text;
+    
+    if (q.type === "single") {
+        let selectHtml = `<select id="hole-0"><option value="">選択</option>`;
+        let opts = shuffle(q.options);
+        opts.forEach(opt => {
+            selectHtml += `<option value="${opt}">${opt}</option>`;
+        });
+        selectHtml += `</select>`;
+        htmlText = htmlText.replace("{0}", selectHtml);
+    } else if (q.type === "unordered") {
+        let opts = shuffle(q.options);
+        q.corrects.forEach((correct, index) => {
+            let selectHtml = `<select id="hole-${index}"><option value="">選択</option>`;
+            opts.forEach(opt => {
+                selectHtml += `<option value="${opt}">${opt}</option>`;
+            });
+            selectHtml += `</select>`;
+            htmlText = htmlText.replace(`{${index}}`, selectHtml);
+        });
+    }
+    
+    document.getElementById("question-text").innerHTML = htmlText;
+    
+    document.getElementById("result-area").style.display = "none";
+    document.getElementById("submit-btn").style.display = "block";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer() {
+    const q = questions[currentIndex];
+    let isCorrect = true;
+    let numHoles = q.type === "single" ? 1 : q.corrects.length;
+    let userAnswers = [];
+    
+    for(let i=0; i<numHoles; i++) {
+        let val = document.getElementById(`hole-${i}`).value;
+        if(!val) {
+            alert("すべての空欄を選択してください。");
+            return;
+        }
+        userAnswers.push(val);
+    }
+    
+    let correctAnswersText = "";
+
+    if (q.type === "single") {
+        if(userAnswers[0] !== q.correct) {
+            isCorrect = false;
+        }
+        correctAnswersText = q.correct;
+    } else if (q.type === "unordered") {
+        let sortedUser = [...userAnswers].sort();
+        let sortedCorrect = [...q.corrects].sort();
+        
+        let uniqueUserAnswers = new Set(userAnswers);
+        if(uniqueUserAnswers.size !== userAnswers.length) {
+            isCorrect = false; 
+        } else {
+            for(let i=0; i<sortedUser.length; i++) {
+                if(sortedUser[i] !== sortedCorrect[i]) {
+                    isCorrect = false;
+                }
+            }
+        }
+        correctAnswersText = q.corrects.join("、");
+    }
+
+    const resultArea = document.getElementById("result-area");
+    const resultMessage = document.getElementById("result-message");
+    const correctAnswerDiv = document.getElementById("correct-answer");
+    
+    resultArea.style.display = "block";
+    
+    if(isCorrect) {
+        resultArea.className = "correct";
+        resultMessage.innerHTML = "⭕ 正解！";
+        correctAnswerDiv.innerHTML = "";
+    } else {
+        resultArea.className = "incorrect";
+        resultMessage.innerHTML = "❌ 不正解";
+        correctAnswerDiv.innerHTML = `正解: <strong>${correctAnswersText}</strong><br><span style="font-size:0.9rem; font-weight:normal;">※複数空欄の場合は順不同で正解となります</span>`;
+    }
+    
+    document.getElementById("submit-btn").style.display = "none";
+    
+    const nextBtn = document.getElementById("next-btn");
+    nextBtn.style.display = "block";
+    if (currentIndex < questions.length - 1) {
+        nextBtn.textContent = "次の問題へ";
+    } else {
+        nextBtn.textContent = "最初からやり直す";
+    }
+    
+    for(let i=0; i<numHoles; i++) {
+        document.getElementById(`hole-${i}`).disabled = true;
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+        currentIndex++;
+    } else {
+        currentIndex = 0;
+    }
+    loadQuestion();
+}
+
+window.onload = loadQuestion;
+</script>
+</body>
+</html>
