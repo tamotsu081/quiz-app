@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>甲状腺障害のある人の看護 ドリル</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        line-height: 1.8;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        max-width: 850px;
+        width: 100%;
+        padding: 40px;
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 1.7rem;
+        color: #2c3e50;
+        text-align: center;
+        border-bottom: 2px solid #16a085;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .progress {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #7f8c8d;
+        margin-bottom: 25px;
+        text-align: right;
+    }
+    .question-text {
+        font-size: 1.25rem;
+        margin-bottom: 30px;
+        line-height: 2.4;
+    }
+    select {
+        font-size: 1.1rem;
+        padding: 6px 10px;
+        margin: 0 6px;
+        border-radius: 6px;
+        border: 2px solid #bdc3c7;
+        background-color: #fafafa;
+        cursor: pointer;
+        color: #2c3e50;
+        font-weight: bold;
+        max-width: 250px;
+    }
+    select:focus {
+        outline: none;
+        border-color: #16a085;
+        background-color: #e8f8f5;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        background-color: #16a085;
+        color: #fff;
+        padding: 16px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 25px;
+    }
+    .btn:hover {
+        background-color: #117a65;
+    }
+    .btn:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+    }
+    #result-area {
+        margin-top: 35px;
+        padding: 25px;
+        border-radius: 8px;
+        display: none;
+        text-align: center;
+    }
+    .correct {
+        background-color: #d5f5e3;
+        color: #27ae60;
+        border: 2px solid #abebc6;
+    }
+    .incorrect {
+        background-color: #fadbd8;
+        color: #c0392b;
+        border: 2px solid #f5b7b1;
+    }
+    .result-heading {
+        font-size: 1.5rem;
+        margin: 0 0 10px 0;
+    }
+    .answer-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 15px;
+        line-height: 1.6;
+    }
+    .citation {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        vertical-align: super;
+        margin-left: 4px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>甲状腺障害のある人の看護 ドリル</h1>
+    <div class="progress" id="progress"></div>
+    <div class="question-text" id="question-text"></div>
+    
+    <button class="btn" id="submit-btn" onclick="checkAnswer()">解答する</button>
+    
+    <div id="result-area">
+        <h3 class="result-heading" id="result-message"></h3>
+        <div id="correct-answer" class="answer-text"></div>
+        <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none;"></button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        text: "内分泌疾患の特徴：ホルモンの分泌異常（増加・低下）により、症状が {0} 、 {1} である。<span class='citation'>[cite: 9]</span>",
+        type: "unordered",
+        corrects: ["全身性", "多彩"],
+        options: ["全身性", "多彩", "局所性", "特異的", "一過性", "単一"]
+    },
+    {
+        text: "甲状腺ホルモンが {0} される疾患の総称を甲状腺機能亢進症という。代表的な疾患は {1} であり、男女比は1:5～10で {2} に多い。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["過剰に分泌", "バセドウ病", "女性"],
+        options: ["過剰に分泌", "バセドウ病", "女性", "枯渇して分泌低下", "橋本病", "男性", "異所性に分泌", "クレチン症", "小児", "高齢者"]
+    },
+    {
+        text: "バセドウ病の症状（甲状腺中毒症所見）として、メルゼブルグの三徴と呼ばれる {0} 、 {1} 、 {2} がみられる。<span class='citation'>[cite: 9]</span>",
+        type: "unordered",
+        corrects: ["甲状腺肥大", "眼球突出", "頻脈"],
+        options: ["甲状腺肥大", "眼球突出", "頻脈", "甲状腺萎縮", "眼瞼下垂", "徐脈", "浮腫", "嗄声", "体重増加", "粘液水腫"]
+    },
+    {
+        text: "バセドウ病の治療：薬物療法として {0} が用いられ、重篤な副作用として {1} がある。また、放射性ヨウ素内用療法は {2} には絶対禁忌である。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["抗甲状腺薬", "顆粒球減少", "妊婦、授乳婦"],
+        options: ["抗甲状腺薬", "顆粒球減少", "妊婦、授乳婦", "甲状腺ホルモン製剤", "血小板減少", "小児", "放射線感受性者", "肝機能障害", "ステロイド薬", "高齢者"]
+    },
+    {
+        text: " {0} は、感染や手術などの誘因により甲状腺機能亢進症が {1} した状態である。主な症状として {2} 、 {3} 、発汗過多・激しい下痢などがみられる。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["甲状腺クリーゼ", "極端な増悪", "高熱", "頻脈"],
+        options: ["甲状腺クリーゼ", "極端な増悪", "高熱", "頻脈", "高カルシウム血症クリーゼ", "一過性の軽快", "低体温", "徐脈", "意識消失", "けいれん", "呼吸不全", "緩徐な進行"]
+    },
+    {
+        text: "甲状腺機能亢進症の看護：外出時の気温や湿度、熱中症予防などの {0} に努める。また、甲状腺眼症に対しては {1} 等で緩和を図る。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["体調管理", "点眼薬"],
+        options: ["体調管理", "点眼薬", "運動療法", "眼帯装着", "隔離管理", "ステロイド軟膏"]
+    },
+    {
+        text: "甲状腺機能低下症は、甲状腺ホルモンの {0} や {1} により全身の代謝が低下する疾患である。代表的な疾患は {2} であり、長期間にわたると {3} （圧痕を残さない浮腫）を生じる。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["減少", "作用不足", "橋本病", "粘液水腫"],
+        options: ["減少", "作用不足", "橋本病", "粘液水腫", "増加", "過剰分泌", "バセドウ病", "凹む浮腫", "亜急性甲状腺炎", "脂肪浮腫"]
+    },
+    {
+        text: "甲状腺機能低下症の治療・看護：治療は {0} の内服である。看護として低体温に対して {1} を行い、また {2} が含まれている食事の摂取状況をアセスメントする。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["T4製剤：チラーヂンS", "保温、室温の調整", "無機ヨウ素"],
+        options: ["T4製剤：チラーヂンS", "保温、室温の調整", "無機ヨウ素", "抗甲状腺薬：メルカゾール", "冷却、室温の低下", "カルシウム", "T3製剤：チロナミン", "水分制限", "カリウム", "鉄分"]
+    },
+    {
+        text: "副甲状腺ホルモン（PTH）は {0} する働きがある。原発性ではPTHが {1} し、これにより {2} 、 {3} をきたす。また、骨変化として {4} が生じる。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["カルシウムとリンの代謝を調節", "自律的かつ過剰に分泌", "高カリウム血症", "低リン血症", "病的骨折"],
+        options: ["カルシウムとリンの代謝を調節", "自律的かつ過剰に分泌", "高カリウム血症", "低リン血症", "病的骨折", "ナトリウムとカリウムの代謝を調節", "枯渇して分泌低下", "低カリウム血症", "高リン血症", "骨軟化症", "高カルシウム血症", "疲労骨折"]
+    },
+    {
+        text: "副甲状腺機能亢進症が急速に進行すると、重篤な中枢神経障害などをきたす {0} となる。看護として、骨病変による {1} や、精神症状軽減のための {2} を行う。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["高カルシウム血症クリーゼ", "骨折の予防", "疼痛緩和"],
+        options: ["高カルシウム血症クリーゼ", "骨折の予防", "疼痛緩和", "低カルシウム血症クリーゼ", "転倒の誘発", "精神安定剤の投与", "甲状腺クリーゼ", "関節拘縮の予防", "意識レベルの低下", "隔離"]
+    },
+    {
+        text: "副甲状腺機能低下症は、PTHの {0} となる疾患である。これにより {1} 、 {2} となり、中枢神経症状や {3} （トルソー徴候など）が出現する。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["作用不全", "低カリウム血症", "高リン血症", "テタニー症状"],
+        options: ["作用不全", "低カリウム血症", "高リン血症", "テタニー症状", "過剰分泌", "高カリウム血症", "低リン血症", "クッシング徴候", "感受性低下", "高カルシウム血症"]
+    },
+    {
+        text: "甲状腺切除術後の看護：異常の早期発見として、気道狭窄による {0} 、創部の腫脹（ {1} ）、および副甲状腺機能低下に伴う {2} に注意する。<span class='citation'>[cite: 9]</span>",
+        type: "ordered",
+        corrects: ["窒息のリスク", "血腫形成", "テタニー症状"],
+        options: ["窒息のリスク", "血腫形成", "テタニー症状", "感染のリスク", "肉芽形成", "眼球突出", "大量出血", "瘢痕形成", "クリーゼ", "甲状腺機能亢進"]
+    }
+];
+
+let currentIndex = 0;
+
+function shuffle(array) {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+function loadQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById("progress").textContent = `問題 ${currentIndex + 1} / ${questions.length}`;
+    
+    let htmlText = q.text;
+    let opts = shuffle(q.options);
+    
+    q.corrects.forEach((correct, index) => {
+        let selectHtml = `<select id="hole-${index}"><option value="">選択してください</option>`;
+        opts.forEach(opt => {
+            selectHtml += `<option value="${opt}">${opt}</option>`;
+        });
+        selectHtml += `</select>`;
+        htmlText = htmlText.replace(`{${index}}`, selectHtml);
+    });
+    
+    document.getElementById("question-text").innerHTML = htmlText;
+    
+    document.getElementById("result-area").style.display = "none";
+    document.getElementById("submit-btn").style.display = "block";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer() {
+    const q = questions[currentIndex];
+    let isCorrect = true;
+    let numHoles = q.corrects.length;
+    let userAnswers = [];
+    
+    for(let i = 0; i < numHoles; i++) {
+        let val = document.getElementById(`hole-${i}`).value;
+        if(!val) {
+            alert("すべての空欄を選択してください。");
+            return;
+        }
+        userAnswers.push(val);
+    }
+    
+    let correctAnswersText = "";
+
+    if (q.type === "unordered") {
+        let sortedUser = [...userAnswers].sort();
+        let sortedCorrect = [...q.corrects].sort();
+        
+        let uniqueUserAnswers = new Set(userAnswers);
+        if(uniqueUserAnswers.size !== userAnswers.length && new Set(q.corrects).size === q.corrects.length) {
+            isCorrect = false; 
+        } else {
+            for(let i = 0; i < sortedUser.length; i++) {
+                if(sortedUser[i] !== sortedCorrect[i]) {
+                    isCorrect = false;
+                }
+            }
+        }
+        correctAnswersText = q.corrects.join("、") + " （順不同）";
+    } else {
+        // ordered (文脈順)
+        for(let i = 0; i < numHoles; i++) {
+            if(userAnswers[i] !== q.corrects[i]) {
+                isCorrect = false;
+            }
+        }
+        correctAnswersText = q.corrects.join(" ➡ ");
+    }
+
+    const resultArea = document.getElementById("result-area");
+    const resultMessage = document.getElementById("result-message");
+    const correctAnswerDiv = document.getElementById("correct-answer");
+    
+    resultArea.style.display = "block";
+    
+    if(isCorrect) {
+        resultArea.className = "correct";
+        resultMessage.innerHTML = "⭕ 正解！";
+        correctAnswerDiv.innerHTML = "";
+    } else {
+        resultArea.className = "incorrect";
+        resultMessage.innerHTML = "❌ 不正解";
+        correctAnswerDiv.innerHTML = `正解: <br><strong>${correctAnswersText}</strong>`;
+    }
+    
+    document.getElementById("submit-btn").style.display = "none";
+    
+    const nextBtn = document.getElementById("next-btn");
+    nextBtn.style.display = "block";
+    if (currentIndex < questions.length - 1) {
+        nextBtn.textContent = "次の問題へ";
+    } else {
+        nextBtn.textContent = "最初からやり直す";
+    }
+    
+    for(let i = 0; i < numHoles; i++) {
+        document.getElementById(`hole-${i}`).disabled = true;
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+        currentIndex++;
+    } else {
+        currentIndex = 0;
+    }
+    loadQuestion();
+}
+
+window.onload = loadQuestion;
+</script>
+</body>
+</html>
