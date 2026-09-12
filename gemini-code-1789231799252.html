@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>救命救急治療 臨床知識○✖ドリル</title>
+    <style>
+        :root {
+            --primary-color: #b91c1c; /* 救急をイメージしたレッド系 */
+            --primary-light: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --correct-color: #10b981;
+            --incorrect-color: #ef4444;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            padding: 32px;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        header h1 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--border-color);
+            height: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-light);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: #f1f5f9;
+            border-left: 6px solid var(--primary-light);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .chapter-tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--text-color);
+            line-height: 1.8;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .btn-choice {
+            padding: 18px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-choice:hover:not(:disabled) {
+            border-color: var(--primary-light);
+            background: #fef2f2;
+            transform: translateY(-2px);
+        }
+
+        .btn-circle { color: var(--correct-color); }
+        .btn-cross { color: var(--incorrect-color); }
+
+        .explanation-card {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .explanation-card.correct {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .explanation-card.incorrect {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .correct-text-box {
+            background: white;
+            padding: 14px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border-left: 4px solid var(--primary-light);
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .explanation-detail {
+            font-size: 0.95rem;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-action:hover {
+            background: var(--primary-light);
+        }
+
+        .final-score-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .final-score-card h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-light);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            .btn-group { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>救命救急治療 臨床知識○✖ドリル</h1>
+        <p>全9章対応｜再読み込みで○/✖判定と順序がシャッフルされます</p>
+    </header>
+
+    <div id="quiz-area">
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="meta-info">
+            <span id="question-number">第 1 問 / 13 問</span>
+            <span id="score-counter">正解数: 0</span>
+        </div>
+
+        <div class="question-card">
+            <span class="chapter-tag" id="chapter-tag">第1章</span>
+            <div class="question-text" id="question-text">問題を読み込み中...</div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-choice btn-circle" onclick="submitAnswer(true)">
+                <span>⭕ 正しい（○）</span>
+            </button>
+            <button class="btn-choice btn-cross" onclick="submitAnswer(false)">
+                <span>❌ 間違い（✖）</span>
+            </button>
+        </div>
+
+        <div class="explanation-card" id="explanation-card">
+            <div class="result-title" id="result-title"></div>
+            <div id="correct-text-container" style="display: none;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">【正確な文章（正文）】</div>
+                <div class="correct-text-box" id="correct-text"></div>
+            </div>
+            <div class="explanation-detail" id="explanation-detail"></div>
+        </div>
+
+        <button class="btn-action" id="next-btn" style="display: none;" onclick="nextQuestion()">次の問題へ ➡</button>
+    </div>
+
+    <div id="final-score-area" style="display: none;" class="final-score-card">
+        <h2>演習終了！</h2>
+        <p>全章の復習が完了しました。</p>
+        <div class="score-display" id="final-score">0 / 13</div>
+        <p id="final-comment" style="margin-bottom: 24px; color: var(--text-muted);"></p>
+        <button class="btn-action" onclick="restartQuiz()">問題をシャッフルして再挑戦 🔄</button>
+    </div>
+</div>
+
+<script>
+// 全9章のデータベース（正文・誤文・解説）
+const rawQuestionBank = [
+    // 第1章
+    {
+        chapter: "第1章:救急看護の理念・特徴・実践の4つの柱",
+        correctText: "救急看護とは迅速かつ適切な看護実践であり、緊急度・重症度の判断を通じて「命を救い・生を支える」ことを目的とする[cite: 9]。",
+        incorrectText: "救急看護とは迅速かつ適切な看護実践であり、病床稼働率・重症度の判断を通じて「早期退院・生を支える」ことを目的とする[cite: 9]。",
+        explanation: "救急状況における判断の軸は、時間的緊急性を示す「緊急度」と、生命の危険度を示す「重症度」の2つです[cite: 9]。"
+    },
+    {
+        chapter: "第1章:救急看護の理念・特徴・実践の4つの柱",
+        correctText: "救急看護の役割体制は、1.救急看護実践、2.調整・管理、3.教育・研究・政策の3つから構成される[cite: 9]。",
+        incorrectText: "救急看護の役割体制は、1.救急看護実践、2.調整・管理、3.生活行動援助・社会的支援の3つから構成される[cite: 9]。",
+        explanation: "生活行動援助・社会的支援は、救急看護実践の「4つの柱」の一部であり、役割体制の3本柱は「実践」「調整・管理」「教育・研究・政策」です[cite: 9]。"
+    },
+
+    // 第2章
+    {
+        chapter: "第2章:臨床推論のプロセス・4パターン・Snap Diagnosis",
+        correctText: "臨床推論の4つのパターンは、①パターン認識、②仮説演繹法、③診断基準/アルゴリズム、④徹底的検討法である[cite: 9]。",
+        incorrectText: "臨床推論の4つのパターンは、①パターン認識、②仮説演繹法、③診断基準/アルゴリズム、④Snap diagnosisである[cite: 9]。",
+        explanation: "Snap diagnosisは徴候の組み合わせにより一気に鑑別を狭める手法の例であり、臨床推論の4パターンの4つ目は「徹底的検討法」です[cite: 9]。"
+    },
+    {
+        chapter: "第2章:臨床推論のプロセス・4パターン・Snap Diagnosis",
+        correctText: "徴候の組み合わせによるSnap diagnosisの具体例として、「甲状腺腫 + 眼球突出 + 頻脈」はバセドウ病の典型例である[cite: 9]。",
+        incorrectText: "徴候の組み合わせによるSnap diagnosisの具体例として、「狭心痛 + 呼吸苦 + 失神」はバセドウ病の典型例である[cite: 9]。",
+        explanation: "「狭心痛 + 呼吸苦 + 失神」は大動脈弁狭窄症の例であり、バセドウ病は「甲状腺腫 + 眼球突出 + 頻脈」となります[cite: 9]。"
+    },
+
+    // 第3章
+    {
+        chapter: "第3章:仮説演繹法と臨床推論のケーススタディ",
+        correctText: "仮説演繹法では、最初の情報から考えられる疾患や状態を想起する「仮説形成」を行い、問題表象に対して3〜5個の鑑別診断セットを立てる[cite: 9]。",
+        incorrectText: "仮説演繹法では、最初の情報から考えられる疾患や状態を想起する「仮説形成」を行い、問題表象に対して10〜15個の鑑別診断セットを立てる[cite: 9]。",
+        explanation: "仮説演繹法では、問題表象に対して「3〜5個」の鑑別診断セットを立て、症状や所見（スモーキングガン）を探し出して検証します[cite: 9]。"
+    },
+
+    // 第4章
+    {
+        chapter: "第4章:救急医療体制・メディカルコントロール・病院前救護",
+        correctText: "救急隊から医療機関への病院連絡方法(MIST)の構成要素は、Mechanism of Injury(受傷機転)、Injury site(受傷部位)、Signs(徴候)、Treatment(病院前救護処置)である[cite: 9]。",
+        incorrectText: "救急隊から医療機関への病院連絡方法(MIST)の構成要素は、Mechanism of Injury(受傷機転)、Incident time(受傷時刻)、Signs(徴候)、Transport(搬送手段)である[cite: 9]。",
+        explanation: "MISTのIは「Injury site(受傷部位)」、Tは「Treatment(病院前救護処置)」を指します[cite: 9]。"
+    },
+
+    // 第5章
+    {
+        chapter: "第5章:外傷初期診療・ロード&ゴー・高エネルギー事故",
+        correctText: "高エネルギー事故の該当基準(受傷機転)において、高所墜落は6m以上（または3階以上）であり、小児の場合は身長の2〜3倍の高さが基準となる[cite: 9]。",
+        incorrectText: "高エネルギー事故の該当基準(受傷機転)において、高所墜落は3m以上（または2階以上）であり、小児の場合は身長の1.5倍の高さが基準となる[cite: 9]。",
+        explanation: "高所墜落の高エネルギー事故基準は「6m以上（または3階以上）」、小児は「身長の2〜3倍の高さ」です[cite: 9]。"
+    },
+
+    // 第6章
+    {
+        chapter: "第6章:Primary Survey (ABCDE) と致命的胸部外傷",
+        correctText: "Primary Surveyの評価項目はA(気道)、B(呼吸)、C(循環)、D(中枢神経障害)、E(脱衣と体温管理)の順に行われ、概ね15秒以内で全体像を把握する[cite: 9]。",
+        incorrectText: "Primary Surveyの評価項目はA(気道)、B(呼吸)、C(中枢神経障害)、D(循環)、E(脱衣と体温管理)の順に行われ、概ね3分以内で全体像を把握する[cite: 9]。",
+        explanation: "Cは循環、Dは中枢神経障害であり、概ね「15秒以内」で全体像を把握し致命的な障害を直ちに治療します[cite: 9]。"
+    },
+    {
+        chapter: "第6章:Primary Survey (ABCDE) と致命的胸部外傷",
+        correctText: "Primary Surveyで同定すべき「致命的胸部外傷」には、気道閉塞、緊張性気胸、開放性気胸、大量血胸、心タンポナーデ、フレイルチェストが含まれる[cite: 9]。",
+        incorrectText: "Primary Surveyで同定すべき「致命的胸部外傷」には、気道閉塞、自然気胸、胸膜炎、微量血胸、心タンポナーデ、肋骨単独骨折が含まれる[cite: 9]。",
+        explanation: "同定すべきは「緊張性気胸」「開放性気胸」「大量血胸」「フレイルチェスト（動揺胸）」などの致命的な外傷です[cite: 9]。"
+    },
+
+    // 第7章
+    {
+        chapter: "第7章:ショックの5徴候・分類・外傷の致死的三徴",
+        correctText: "外傷の致死的三徴とは、低体温、凝固障害、代謝性アシドーシスであり、体温が35℃以下になると酸素消費量が著しく増加する[cite: 9]。",
+        incorrectText: "外傷の致死的三徴とは、高体温、血小板増多、呼吸性アルカローシスであり、体温が38℃以上になると酸素消費量が著しく増加する[cite: 9]。",
+        explanation: "外傷の致死的三徴は「低体温」「凝固障害」「代謝性アシドーシス」です[cite: 9]。"
+    },
+    {
+        chapter: "第7章:ショックの5徴候・分類・外傷の致死的三徴",
+        correctText: "ショックの分類において、出血や体液喪失によるものは循環血液量減少性ショック、心タンポナーデや緊張性気胸によるものは心外閉塞・拘束性ショックである[cite: 9]。",
+        incorrectText: "ショックの分類において、アナフィラキシーや敗血症によるものは循環血液量減少性ショック、心タンポナーデや緊張性気胸によるものは血液分布異常性ショックである[cite: 9]。",
+        explanation: "アナフィラキシーや敗血症は「血液分布異常性ショック」、心タンポナーデ等は「心外閉塞・拘束性ショック」に分類されます[cite: 9]。"
+    },
+
+    // 第8章
+    {
+        chapter: "第8章:Secondary Survey と事例 (Case 1) の経過",
+        correctText: "Secondary Survey (全身評価)に入った後も、患者の状態に変化があった場合は必ずPrimary Surveyに戻る[cite: 9]。",
+        incorrectText: "Secondary Survey (全身評価)に入った後は、患者の状態に変化があっても中断せず、最後までSecondary Surveyを完了させなければならない[cite: 9]。",
+        explanation: "患者の状態に変化があった場合は、必ず初期評価であるPrimary Surveyに戻って評価をやり直します[cite: 9]。"
+    },
+
+    // 第9章
+    {
+        chapter: "第9章:家族システムの特性・危機モデル・救急看護の特長",
+        correctText: "危機的状況下の家族アセスメントモデル（フィンクの危機モデル）の4段階は、1.衝撃(ショック)、2.防衛的退行、3.承認、4.適応である[cite: 9]。",
+        incorrectText: "危機的状況下の家族アセスメントモデル（フィンクの危機モデル）の4段階は、1.衝撃(ショック)、2.攻撃的行動、3.受容、4.忘却である[cite: 9]。",
+        explanation: "フィンクの危機モデルの正しい4段階は「1.衝撃(ショック) → 2.防衛的退行 → 3.承認 → 4.適応」です[cite: 9]。"
+    }
+];
+
+let generatedQuizData = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let answered = false;
+
+// 配列シャッフル関数 (Fisher-Yates)
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// クイズ初期化：問題順序をシャッフルし、各問の「正文/誤文」提示を50%の確率でランダム決定
+function initQuiz() {
+    const shuffledRaw = shuffleArray(rawQuestionBank);
+    generatedQuizData = shuffledRaw.map((q, idx) => {
+        const isTrueStatement = Math.random() < 0.5; // 50%の確率で○か✖かをランダム決定
+        return {
+            id: idx + 1,
+            chapter: q.chapter,
+            displayText: isTrueStatement ? q.correctText : q.incorrectText,
+            isCorrectAnswer: isTrueStatement, 
+            correctText: q.correctText,
+            explanation: q.explanation
+        };
+    });
+
+    currentQuestionIndex = 0;
+    score = 0;
+    document.getElementById("quiz-area").style.display = "block";
+    document.getElementById("final-score-area").style.display = "none";
+    showQuestion();
+}
+
+// 問題表示
+function showQuestion() {
+    answered = false;
+    const q = generatedQuizData[currentQuestionIndex];
+    
+    document.getElementById("chapter-tag").innerText = q.chapter;
+    document.getElementById("question-text").innerText = q.displayText;
+    document.getElementById("question-number").innerText = `第 ${currentQuestionIndex + 1} 問 / ${generatedQuizData.length} 問`;
+    document.getElementById("score-counter").innerText = `正解数: ${score}`;
+    
+    // 進捗バー
+    const progressPercent = ((currentQuestionIndex) / generatedQuizData.length) * 100;
+    document.getElementById("progress-bar").style.width = `${progressPercent}%`;
+
+    // UIリセット
+    document.getElementById("explanation-card").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+    
+    const choiceBtns = document.querySelectorAll(".btn-choice");
+    choiceBtns.forEach(btn => btn.disabled = false);
+}
+
+// 回答処理
+function submitAnswer(userChoice) {
+    if (answered) return;
+    answered = true;
+
+    const q = generatedQuizData[currentQuestionIndex];
+    const isUserCorrect = (userChoice === q.isCorrectAnswer);
+
+    const choiceBtns = document.querySelectorAll(".btn-choice");
+    choiceBtns.forEach(btn => btn.disabled = true);
+
+    const expCard = document.getElementById("explanation-card");
+    const resultTitle = document.getElementById("result-title");
+    const correctTextContainer = document.getElementById("correct-text-container");
+    const correctTextDiv = document.getElementById("correct-text");
+    const expDetail = document.getElementById("explanation-detail");
+
+    expCard.style.display = "block";
+
+    if (isUserCorrect) {
+        score++;
+        document.getElementById("score-counter").innerText = `正解数: ${score}`;
+        expCard.className = "explanation-card correct";
+        resultTitle.innerHTML = `⭕ 正解！ <span style="font-size:0.95rem; font-weight:normal;">(${q.isCorrectAnswer ? 'この文章は正しいです' : 'この文章は誤りです'})</span>`;
+    } else {
+        expCard.className = "explanation-card incorrect";
+        resultTitle.innerHTML = `❌ 不正解... <span style="font-size:0.95rem; font-weight:normal;">(${q.isCorrectAnswer ? '正解は「正しい（○）」でした' : '正解は「間違い（✖）」でした'})</span>`;
+    }
+
+    if (!q.isCorrectAnswer || !isUserCorrect) {
+        correctTextContainer.style.display = "block";
+        correctTextDiv.innerText = q.correctText;
+    } else {
+        correctTextContainer.style.display = "none";
+    }
+
+    expDetail.innerText = "💡 解説・臨床ポイント： " + q.explanation;
+    document.getElementById("next-btn").style.display = "block";
+}
+
+// 次の問題へ
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < generatedQuizData.length) {
+        showQuestion();
+    } else {
+        showFinalScore();
+    }
+}
+
+// 最終スコア画面
+function showFinalScore() {
+    document.getElementById("quiz-area").style.display = "none";
+    const finalScoreArea = document.getElementById("final-score-area");
+    finalScoreArea.style.display = "block";
+    
+    const total = generatedQuizData.length;
+    document.getElementById("final-score").innerText = `${score} / ${total} 問`;
+
+    const percentage = (score / total) * 100;
+    let comment = "";
+    if (percentage === 100) {
+        comment = "素晴らしい！救命救急治療の知識が完璧に頭に入っています！";
+    } else if (percentage >= 80) {
+        comment = "合格ラインです！間違えた箇所の【正文】をしっかり見直して完璧を目指しましょう。";
+    } else {
+        comment = "繰り返し挑戦して、精緻な間違いを見抜ける臨床知識を定着させましょう！";
+    }
+    document.getElementById("final-comment").innerText = comment;
+}
+
+// やり直し
+function restartQuiz() {
+    initQuiz();
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
