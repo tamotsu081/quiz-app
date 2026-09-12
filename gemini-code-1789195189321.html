@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>川崎病の看護 ドリル</title>
+<style>
+    body {
+        font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+        background-color: #f4f7f6;
+        color: #333;
+        line-height: 1.8;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+    }
+    .container {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        max-width: 850px;
+        width: 100%;
+        padding: 40px;
+        box-sizing: border-box;
+    }
+    h1 {
+        font-size: 1.7rem;
+        color: #2c3e50;
+        text-align: center;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 15px;
+        margin-bottom: 25px;
+    }
+    .progress {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #7f8c8d;
+        margin-bottom: 25px;
+        text-align: right;
+    }
+    .question-text {
+        font-size: 1.25rem;
+        margin-bottom: 30px;
+        line-height: 2.4;
+    }
+    select {
+        font-size: 1.1rem;
+        padding: 6px 10px;
+        margin: 0 6px;
+        border-radius: 6px;
+        border: 2px solid #bdc3c7;
+        background-color: #fafafa;
+        cursor: pointer;
+        color: #2c3e50;
+        font-weight: bold;
+        max-width: 250px;
+    }
+    select:focus {
+        outline: none;
+        border-color: #3498db;
+        background-color: #ebf5fb;
+    }
+    .btn {
+        display: block;
+        width: 100%;
+        background-color: #3498db;
+        color: #fff;
+        padding: 16px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 25px;
+    }
+    .btn:hover {
+        background-color: #2980b9;
+    }
+    .btn:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+    }
+    #result-area {
+        margin-top: 35px;
+        padding: 25px;
+        border-radius: 8px;
+        display: none;
+        text-align: center;
+    }
+    .correct {
+        background-color: #d5f5e3;
+        color: #27ae60;
+        border: 2px solid #abebc6;
+    }
+    .incorrect {
+        background-color: #fadbd8;
+        color: #c0392b;
+        border: 2px solid #f5b7b1;
+    }
+    .result-heading {
+        font-size: 1.5rem;
+        margin: 0 0 10px 0;
+    }
+    .answer-text {
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-top: 15px;
+        line-height: 1.6;
+    }
+    .citation {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        vertical-align: super;
+        margin-left: 4px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>川崎病の看護 ドリル</h1>
+    <div class="progress" id="progress"></div>
+    <div class="question-text" id="question-text"></div>
+    
+    <button class="btn" id="submit-btn" onclick="checkAnswer()">解答する</button>
+    
+    <div id="result-area">
+        <h3 class="result-heading" id="result-message"></h3>
+        <div id="correct-answer" class="answer-text"></div>
+        <button class="btn" id="next-btn" onclick="nextQuestion()" style="display:none;"></button>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {
+        text: "川崎病は全身の中小血管を主体とした {0} であり、冠動脈を中心にした心臓障害は {1} を残したり、 {2} の原因になる。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["急性血管炎", "後遺症", "突然死"],
+        options: ["急性血管炎", "後遺症", "突然死", "慢性血管炎", "心不全", "不整脈", "先天性心疾患", "動脈硬化"]
+    },
+    {
+        text: "川崎病の病態：炎症の進展に伴い内外弾性板や {0} が破壊され、冠動脈は {1} 変化を示し、重症例では {2} 形成となる。そこに {3} を形成しやすい。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["中膜平滑筋層", "膨張・拡張", "動脈瘤", "血栓"],
+        options: ["中膜平滑筋層", "膨張・拡張", "動脈瘤", "血栓", "血管内皮細胞", "収縮・狭窄", "石灰化", "プラーク", "静脈瘤", "出血"]
+    },
+    {
+        text: "川崎病の主要症状（前半）： {0} 、 {1} 、口腔・口唇所見として {2} や {3} がみられる。<span class='citation'></span>",
+        type: "unordered",
+        corrects: ["発熱", "両側眼球結膜充血", "口唇紅潮", "いちご舌"],
+        options: ["発熱", "両側眼球結膜充血", "口唇紅潮", "いちご舌", "黄疸", "片側眼球結膜充血", "口内炎", "アフタ", "咳嗽", "チアノーゼ"]
+    },
+    {
+        text: "川崎病の主要症状（後半）： {0} 、四肢末端の変化として急性期に {1} と {2} 、回復期に {3} がみられる。また、急性期における {4} リンパ節腫脹がある。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["発疹(BCG接種痕の発赤も含む)", "硬性浮腫", "指趾先の紅潮", "膜様落屑", "非化膿性"],
+        options: ["発疹(BCG接種痕の発赤も含む)", "硬性浮腫", "指趾先の紅潮", "膜様落屑", "非化膿性", "水疱", "点状出血", "陥凹性浮腫", "化膿性", "乾癬様落屑", "肉芽腫性"]
+    },
+    {
+        text: "参考条項：川崎病が疑われる所見として、病初期の {0} 値の上昇、乳児の尿中 {1} 増加、回復期の {2} 増多などがある。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["トランスアミナーゼ", "白血球", "血小板"],
+        options: ["トランスアミナーゼ", "白血球", "血小板", "クレアチニン", "赤血球", "好酸球", "尿蛋白", "アミラーゼ"]
+    },
+    {
+        text: "冠動脈病変：発熱後10日〜2週間後が最も変化が強く、一過性の冠動脈の {0} や {1} の出現がみられる。発見には {2} を用い、急性期に瘤が {3} mmを超えた場合は肥厚してくる可能性がある。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["拡張", "瘤", "心エコー", "4"],
+        options: ["拡張", "瘤", "心エコー", "4", "狭窄", "石灰化", "心電図", "胸部X線", "8", "2"]
+    },
+    {
+        text: "治療（第1選択）： {0} 療法が行われる。副作用として {1} や {2} に注意する。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["γ-グロブリン大量", "ショック アナフィラキシー症状", "肝機能障害"],
+        options: ["γ-グロブリン大量", "ショック アナフィラキシー症状", "肝機能障害", "ステロイド・パルス", "腎機能障害", "高血圧", "消化管出血", "血小板減少"]
+    },
+    {
+        text: "治療（第2選択）： {0} 療法があり、抗血管炎症や血小板凝集抑制効果がある。副作用として肝機能障害や胃荒れ、 {1} がある。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["アスピリン", "易出血"],
+        options: ["アスピリン", "易出血", "ワルファリン", "ヘパリン", "血栓形成", "白血球減少", "便秘", "不整脈"]
+    },
+    {
+        text: "急性期の看護：激しい胸痛などの {0} 発作の兆候に注意する。体力消耗を最小限にするため必要以上に {1} 。また、脱水予防のため {2} や {3} を把握する。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["心筋梗塞", "泣かせない", "水分出納", "尿量"],
+        options: ["心筋梗塞", "泣かせない", "水分出納", "尿量", "狭心症", "運動させる", "食事量", "発汗量", "心不全", "離床を促す"]
+    },
+    {
+        text: "回復期・退院：退院の目安は、白血球、CRP、 {0} などの炎症症状や血小板数増多がおさまることである。また、元気だからといって自己判断して {1} ことに留意する。<span class='citation'></span>",
+        type: "ordered",
+        corrects: ["血沈", "定期受診はやめない"],
+        options: ["血沈", "定期受診はやめない", "赤血球", "尿蛋白", "運動制限を解除しない", "服薬を中止しない", "BNP", "予防接種を受けない"]
+    }
+];
+
+let currentIndex = 0;
+
+function shuffle(array) {
+    let newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
+
+function loadQuestion() {
+    const q = questions[currentIndex];
+    document.getElementById("progress").textContent = `問題 ${currentIndex + 1} / ${questions.length}`;
+    
+    let htmlText = q.text;
+    let opts = shuffle(q.options);
+    
+    q.corrects.forEach((correct, index) => {
+        let selectHtml = `<select id="hole-${index}"><option value="">選択してください</option>`;
+        opts.forEach(opt => {
+            selectHtml += `<option value="${opt}">${opt}</option>`;
+        });
+        selectHtml += `</select>`;
+        htmlText = htmlText.replace(`{${index}}`, selectHtml);
+    });
+    
+    document.getElementById("question-text").innerHTML = htmlText;
+    
+    document.getElementById("result-area").style.display = "none";
+    document.getElementById("submit-btn").style.display = "block";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer() {
+    const q = questions[currentIndex];
+    let isCorrect = true;
+    let numHoles = q.corrects.length;
+    let userAnswers = [];
+    
+    for(let i = 0; i < numHoles; i++) {
+        let val = document.getElementById(`hole-${i}`).value;
+        if(!val) {
+            alert("すべての空欄を選択してください。");
+            return;
+        }
+        userAnswers.push(val);
+    }
+    
+    let correctAnswersText = "";
+
+    if (q.type === "unordered") {
+        let sortedUser = [...userAnswers].sort();
+        let sortedCorrect = [...q.corrects].sort();
+        
+        let uniqueUserAnswers = new Set(userAnswers);
+        if(uniqueUserAnswers.size !== userAnswers.length && new Set(q.corrects).size === q.corrects.length) {
+            isCorrect = false; 
+        } else {
+            for(let i = 0; i < sortedUser.length; i++) {
+                if(sortedUser[i] !== sortedCorrect[i]) {
+                    isCorrect = false;
+                }
+            }
+        }
+        correctAnswersText = q.corrects.join("、") + " （順不同）";
+    } else {
+        for(let i = 0; i < numHoles; i++) {
+            if(userAnswers[i] !== q.corrects[i]) {
+                isCorrect = false;
+            }
+        }
+        correctAnswersText = q.corrects.join(" ➡ ");
+    }
+
+    const resultArea = document.getElementById("result-area");
+    const resultMessage = document.getElementById("result-message");
+    const correctAnswerDiv = document.getElementById("correct-answer");
+    
+    resultArea.style.display = "block";
+    
+    if(isCorrect) {
+        resultArea.className = "correct";
+        resultMessage.innerHTML = "⭕ 正解！";
+        correctAnswerDiv.innerHTML = "";
+    } else {
+        resultArea.className = "incorrect";
+        resultMessage.innerHTML = "❌ 不正解";
+        correctAnswerDiv.innerHTML = `正解: <br><strong>${correctAnswersText}</strong>`;
+    }
+    
+    document.getElementById("submit-btn").style.display = "none";
+    
+    const nextBtn = document.getElementById("next-btn");
+    nextBtn.style.display = "block";
+    if (currentIndex < questions.length - 1) {
+        nextBtn.textContent = "次の問題へ";
+    } else {
+        nextBtn.textContent = "最初からやり直す";
+    }
+    
+    for(let i = 0; i < numHoles; i++) {
+        document.getElementById(`hole-${i}`).disabled = true;
+    }
+}
+
+function nextQuestion() {
+    if (currentIndex < questions.length - 1) {
+        currentIndex++;
+    } else {
+        currentIndex = 0;
+    }
+    loadQuestion();
+}
+
+window.onload = loadQuestion;
+</script>
+</body>
+</html>
