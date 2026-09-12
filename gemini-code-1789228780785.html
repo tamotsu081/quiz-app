@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ワークアウト・カスタムタイマー</title>
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --primary: #00e676; /* WORKカラー（緑） */
+      --rest: #ff9100;    /* RESTカラー（オレンジ） */
+      --text: #ffffff;
+      --sub-text: #b0bec5;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: var(--primary);
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+      color: var(--sub-text);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:active {
+      opacity: 0.8;
+    }
+
+    .btn-primary { background: var(--primary); color: #000; }
+    .btn-secondary { background: #424242; color: #fff; }
+    .btn-danger { background: #ff5252; color: #fff; }
+
+    /* タイマー表示画面 */
+    #timer-display {
+      display: none;
+      text-align: center;
+    }
+
+    .status-badge {
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .status-work { background: var(--primary); color: #000; }
+    .status-rest { background: var(--rest); color: #000; }
+    .status-prepare { background: #29b6f6; color: #000; }
+
+    .time-large {
+      font-size: 5rem;
+      font-weight: bold;
+      font-family: monospace;
+      margin: 10px 0;
+      line-height: 1;
+    }
+
+    .exercise-info {
+      font-size: 1.2rem;
+      color: var(--sub-text);
+      margin-bottom: 20px;
+    }
+
+    /* 種目別カスタム入力リスト */
+    #custom-list {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 10px;
+      padding-right: 5px;
+    }
+
+    .custom-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+    }
+
+    .custom-row span {
+      width: 60px;
+    }
+
+    .custom-row input {
+      padding: 6px;
+    }
+
+    /* 切り替えタブ */
+    .mode-selector {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #333;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      background: none;
+      color: var(--sub-text);
+      border-radius: 0;
+    }
+
+    .mode-tab.active {
+      color: var(--primary);
+      border-bottom: 2px solid var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>WORKOUT TIMER</h1>
+
+  <!-- 設定画面 -->
+  <div id="setup-card" class="card">
+    <div class="mode-selector">
+      <button class="mode-tab active" onclick="switchMode('simple')">一括設定</button>
+      <button class="mode-tab" onclick="switchMode('custom')">個別カスタマイズ</button>
+    </div>
+
+    <div class="form-group">
+      <label for="total-rounds">種目数（セット数）</label>
+      <input type="number" id="total-rounds" value="7" min="1" max="30" onchange="generateCustomFields()">
+    </div>
+
+    <!-- 一括設定モード -->
+    <div id="simple-mode">
+      <div class="form-group">
+        <label for="simple-work">動く時間 (秒)</label>
+        <input type="number" id="simple-work" value="40" min="1">
+      </div>
+      <div class="form-group">
+        <label for="simple-rest">レスト時間 (秒)</label>
+        <input type="number" id="simple-rest" value="20" min="0">
+      </div>
+    </div>
+
+    <!-- 個別カスタマイズモード -->
+    <div id="custom-mode" style="display: none;">
+      <label>種目ごとの秒数設定</label>
+      <div id="custom-list"></div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-primary" onclick="startWorkout()">スタート！</button>
+    </div>
+  </div>
+
+  <!-- タイマー実行画面 -->
+  <div id="timer-display" class="card">
+    <div id="status-badge" class="status-badge status-prepare">準備</div>
+    <div id="time-text" class="time-large">00:05</div>
+    <div id="exercise-info" class="exercise-info">種目: 1 / 7</div>
+
+    <div class="btn-group">
+      <button id="pause-btn" class="btn-secondary" onclick="togglePause()">一時停止</button>
+      <button class="btn-danger" onclick="resetTimer()">終了</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let timerMode = 'simple';
+  let workoutPlan = [];
+  let currentStepIndex = 0;
+  let timeRemaining = 0;
+  let timerInterval = null;
+  let isPaused = false;
+
+  // Web Audio API による効果音生成
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playBeep(freq = 880, duration = 0.15, type = 'sine') {
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    
+    // 音量設定（小さすぎず大きすぎない絶妙な音量）
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+  }
+
+  // 切り替え予告音（ピ・ピ・ピ）
+  function playCountBeep() {
+    playBeep(784, 0.1); // G5音
+  }
+
+  // 切り替え本番音（ピーッ！）
+  function playSwitchBeep() {
+    playBeep(1567, 0.35); // G6音
+  }
+
+  function switchMode(mode) {
+    timerMode = mode;
+    document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+    if (mode === 'simple') {
+      document.querySelectorAll('.mode-tab')[0].classList.add('active');
+      document.getElementById('simple-mode').style.display = 'block';
+      document.getElementById('custom-mode').style.display = 'none';
+    } else {
+      document.querySelectorAll('.mode-tab')[1].classList.add('active');
+      document.getElementById('simple-mode').style.display = 'none';
+      document.getElementById('custom-mode').style.display = 'block';
+      generateCustomFields();
+    }
+  }
+
+  function generateCustomFields() {
+    const rounds = parseInt(document.getElementById('total-rounds').value) || 1;
+    const container = document.getElementById('custom-list');
+    container.innerHTML = '';
+
+    for (let i = 1; i <= rounds; i++) {
+      const row = document.createElement('div');
+      row.className = 'custom-row';
+      row.innerHTML = `
+        <span>種目 ${i}:</span>
+        <input type="number" class="c-work" value="${i % 2 === 0 ? 30 : 40}" placeholder="動(秒)">
+        <input type="number" class="c-rest" value="20" placeholder="休(秒)">
+      `;
+      container.appendChild(row);
+    }
+  }
+
+  function buildWorkoutPlan() {
+    const rounds = parseInt(document.getElementById('total-rounds').value) || 1;
+    workoutPlan = [];
+
+    // 最初に5秒の準備時間を入れる
+    workoutPlan.push({ type: 'PREPARE', duration: 5, label: '準備', round: 1, totalRounds: rounds });
+
+    if (timerMode === 'simple') {
+      const workSec = parseInt(document.getElementById('simple-work').value) || 10;
+      const restSec = parseInt(document.getElementById('simple-rest').value) || 0;
+
+      for (let i = 1; i <= rounds; i++) {
+        workoutPlan.push({ type: 'WORK', duration: workSec, label: 'WORK', round: i, totalRounds: rounds });
+        if (restSec > 0 && i < rounds) {
+          workoutPlan.push({ type: 'REST', duration: restSec, label: 'REST', round: i, totalRounds: rounds });
+        }
+      }
+    } else {
+      const cWorks = document.querySelectorAll('.c-work');
+      const cRests = document.querySelectorAll('.c-rest');
+
+      for (let i = 0; i < rounds; i++) {
+        const wSec = parseInt(cWorks[i].value) || 10;
+        const rSec = parseInt(cRests[i].value) || 0;
+        workoutPlan.push({ type: 'WORK', duration: wSec, label: `WORK`, round: i + 1, totalRounds: rounds });
+        if (rSec > 0 && i < rounds - 1) {
+          workoutPlan.push({ type: 'REST', duration: rSec, label: `REST`, round: i + 1, totalRounds: rounds });
+        }
+      }
+    }
+  }
+
+  function startWorkout() {
+    // スマホでのオーディオ再生制限を解除
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+
+    buildWorkoutPlan();
+    currentStepIndex = 0;
+    isPaused = false;
+
+    document.getElementById('setup-card').style.display = 'none';
+    document.getElementById('timer-display').style.display = 'block';
+
+    loadStep();
+    timerInterval = setInterval(updateTimer, 1000);
+  }
+
+  function loadStep() {
+    if (currentStepIndex >= workoutPlan.length) {
+      finishWorkout();
+      return;
+    }
+
+    const currentStep = workoutPlan[currentStepIndex];
+    timeRemaining = currentStep.duration;
+
+    const badge = document.getElementById('status-badge');
+    badge.innerText = currentStep.label;
+    badge.className = 'status-badge ' + 
+      (currentStep.type === 'WORK' ? 'status-work' : 
+       currentStep.type === 'REST' ? 'status-rest' : 'status-prepare');
+
+    document.getElementById('exercise-info').innerText = `種目: ${currentStep.round} / ${currentStep.totalRounds}`;
+    updateDisplay();
+  }
+
+  function updateTimer() {
+    if (isPaused) return;
+
+    if (timeRemaining > 0) {
+      // 残り3秒、2秒、1秒で「ピッ」と鳴らす
+      if (timeRemaining <= 3 && timeRemaining > 0) {
+        playCountBeep();
+      }
+      timeRemaining--;
+      updateDisplay();
+    } else {
+      // 切り替え時に「ピーッ！」と鳴らす
+      playSwitchBeep();
+      currentStepIndex++;
+      loadStep();
+    }
+  }
+
+  function updateDisplay() {
+    const min = Math.floor(timeRemaining / 60);
+    const sec = timeRemaining % 60;
+    document.getElementById('time-text').innerText = 
+      `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  function togglePause() {
+    isPaused = !isPaused;
+    document.getElementById('pause-btn').innerText = isPaused ? '再開' : '一時停止';
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    document.getElementById('setup-card').style.display = 'block';
+    document.getElementById('timer-display').style.display = 'none';
+    document.getElementById('pause-btn').innerText = '一時停止';
+  }
+
+  function finishWorkout() {
+    clearInterval(timerInterval);
+    playSwitchBeep();
+    alert('お疲れ様でした！トレーニング完了です！');
+    resetTimer();
+  }
+</script>
+</body>
+</html>
