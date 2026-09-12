@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>危機的状況にある人の看護 穴埋めクイズ</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --correct: #10b981;
+            --incorrect: #ef4444;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-sub);
+            font-weight: bold;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: var(--border);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            background: #f8fafc;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 24px;
+            font-size: 1.15rem;
+            line-height: 1.8;
+            font-weight: bold;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 0 8px;
+            margin: 0 4px;
+        }
+
+        .instruction {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+
+        /* 4択（単一選択）用スタイル */
+        .grid-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: #eff6ff;
+        }
+
+        .btn-option:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* 複数選択（チェックボックス）用スタイル */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            background: white;
+            font-size: 1.05rem;
+        }
+
+        .checkbox-label:hover {
+            background: #eff6ff;
+        }
+
+        .checkbox-label input {
+            margin-right: 12px;
+            transform: scale(1.3);
+        }
+        
+        .checkbox-label.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f1f5f9;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--primary-hover);
+        }
+        
+        .btn-submit:disabled {
+            background: var(--text-sub);
+            cursor: not-allowed;
+        }
+
+        /* 結果表示エリア */
+        .result-area {
+            display: none;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .result-area.correct {
+            background-color: #ecfdf5;
+            border: 1px solid #a7f3d0;
+        }
+
+        .result-area.incorrect {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .correct-text.correct { color: #065f46; }
+        .correct-text.incorrect { color: #991b1b; }
+
+        .full-sentence {
+            background: white;
+            padding: 16px;
+            border-radius: 6px;
+            margin: 12px 0;
+            border-left: 4px solid var(--primary);
+            font-weight: bold;
+        }
+
+        .btn-next {
+            width: 100%;
+            padding: 16px;
+            background: var(--text-main);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        /* 最終スコア画面 */
+        .final-score {
+            display: none;
+            text-align: center;
+            padding: 40px 0;
+        }
+        .final-score h2 { color: var(--primary); font-size: 2rem; margin-bottom: 16px; }
+        .final-score .score-num { font-size: 3.5rem; font-weight: bold; margin: 20px 0; color: var(--text-main); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .grid-options, .checkbox-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container">
+    <header>
+        <h1>危機的状況にある人の看護 穴埋めドリル</h1>
+    </header>
+
+    <div id="quiz-screen">
+        <div class="meta-info">
+            <span id="q-counter">第 1 問 / 34 問</span>
+            <span id="score-counter">正解: 0</span>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="question-box" id="question-text">
+            <!-- 問題文がここに入ります -->
+        </div>
+
+        <div class="instruction" id="instruction-text"></div>
+
+        <!-- 選択肢エリア -->
+        <div id="options-area"></div>
+
+        <!-- 結果表示エリア -->
+        <div class="result-area" id="result-area">
+            <div class="result-title correct-text" id="result-title"></div>
+            <div style="font-size: 0.9rem; margin-bottom:4px;">【完成した正しい文章】</div>
+            <div class="full-sentence" id="full-sentence"></div>
+            <button class="btn-next" onclick="nextQuestion()">次の問題へ ➡</button>
+        </div>
+    </div>
+
+    <!-- 最終スコア画面 -->
+    <div class="final-score" id="final-screen">
+        <h2>演習完了！</h2>
+        <div class="score-num" id="final-score-num">0 / 34</div>
+        <p style="margin-bottom: 30px;" id="final-comment"></p>
+        <button class="btn-submit" onclick="location.reload()">問題をシャッフルして再挑戦 🔄</button>
+    </div>
+</div>
+
+<script>
+const rawQuestions = [
+    // --- 1ページ目 ---
+    { text: "冠状動脈の血液は、[ ] に流れる。", correct: ["拡張期"], dummy: ["収縮期", "等容性収縮期", "駆出期"] },
+    { text: "★IABPの合併症として、[ ]、血栓形成・動脈損傷による [ ]、[ ]、血小板減少などの [ ] に注意する。", correct: ["出血", "下肢虚血", "感染症", "凝固異常"], dummy: ["脳梗塞", "大動脈弁閉鎖不全", "肺塞栓症", "心タンポナーデ", "縦隔炎", "気胸"] },
+    { text: "IABPのバルーン先端部分は [ ] に留置する。", correct: ["胸部下行大動脈"], dummy: ["腹部大動脈", "大動脈基部", "上行大動脈"] },
+    { text: "IABPのバルーン長は [ ] から [ ] 上におさまるサイズを選択する。", correct: ["大動脈遠位弓部", "腹腔動脈"], dummy: ["腕頭動脈", "腎動脈", "腸骨動脈", "上腸間膜動脈"] },
+    { text: "IABP挿入中、下肢の [ ] は禁止である。", correct: ["屈曲"], dummy: ["伸展", "外転", "内転"] },
+    { text: "IABP管理中、ヘリウムガスチューブ内に [ ] や [ ] の血液がないか確認する。", correct: ["血塊", "水滴状"], dummy: ["結露", "気泡", "フィブリン", "脂肪滴"] },
+    { text: "IABPカテーテルは、主に [ ] から挿入する。", correct: ["大腿動脈"], dummy: ["橈骨動脈", "大腿静脈", "鎖骨下静脈"] },
+    { text: "IABPにおいて心電図トリガーの場合は、体位変換や清潔ケアなどで、[ ] のずれや [ ] 混入に注意する。", correct: ["電極", "ノイズ"], dummy: ["ケーブル", "アーチファクト", "センサー", "バルーン"] },
+    { text: "ヘリウムガスの残量確認は、血液中に [ ] が入ってしまっているのを発見するために行う。", correct: ["ヘリウム"], dummy: ["空気", "窒素", "酸素"] },
+    { text: "IABP挿入中の観察として、刺入部の [ ] と [ ] の確認を行う。", correct: ["出血", "腫脹"], dummy: ["発赤", "疼痛", "滲出液", "壊死"] },
+    { text: "IABP挿入中の下肢の良肢位の保持において、[ ] 神経麻痺に注意する。", correct: ["腓骨"], dummy: ["坐骨", "脛骨", "大腿"] },
+    { text: "IABP挿入中は [ ] 障害の兆候に注意し、下肢動脈の触知として [ ] 動脈や [ ] 動脈を確認する。", correct: ["末梢循環", "足背", "後脛骨"], dummy: ["中枢神経", "大腿", "膝窩", "前脛骨", "腸骨", "橈骨", "尺骨"] },
+    { text: "IABP管理中、安静・同一体位による [ ] や [ ] に配慮する。", correct: ["苦痛", "腰痛"], dummy: ["褥瘡", "不眠", "筋力低下", "関節拘縮"] },
+    
+    // --- 2ページ目 ---
+    { text: "IABPの合併症で、腹痛や腰背部痛の訴えが強い場合は [ ] 出血に注意する。", correct: ["後腹膜"], dummy: ["消化管", "腹腔内", "骨盤内"] },
+    { text: "IABPからの離脱時は、[ ] 比率を下げていく。", correct: ["補助"], dummy: ["駆動", "トリガー", "アシスト"] },
+    { text: "IABP離脱中は、循環動態の変化に注意し、心電図の [ ] 変化の有無や、[ ] の有無を確認する。", correct: ["ST", "不整脈"], dummy: ["T波", "異常Q波", "房室ブロック", "心房細動"] },
+    { text: "IABP離脱時、[ ] の虚血を疑うなど、循環動態が悪化した場合は離脱を中止する。", correct: ["心筋"], dummy: ["下肢", "脳", "腸管"] },
+    { text: "IABP抜去部の合併症として、出血、[ ]、[ ] がある。", correct: ["血腫", "皮下出血"], dummy: ["仮性動脈瘤", "動静脈瘻", "感染", "壊死"] },
+    { text: "IABPの補助がなくなることで、[ ] や [ ] 症状が出現するリスクがある。", correct: ["血圧低下", "胸部"], dummy: ["頻脈", "意識障害", "呼吸困難", "腹部"] },
+    { text: "IABP抜去後の圧迫止血に伴う [ ] 神経反射の出現リスクに注意する。", correct: ["迷走"], dummy: ["交感", "舌咽", "三叉"] },
+    { text: "冠状動脈バイパス術(CABG)は、冠動脈の [ ] 部よりも [ ] の部分と大動脈をバイパス血管でつなぎ、心筋へ送られる血流を増加させる。", correct: ["狭窄", "末梢"], dummy: ["閉塞", "中枢", "分岐", "基部"] },
+    { text: "CABGの術式において、体外循環を使用しないものを [ ] 動下バイパス術という。", correct: ["心拍"], dummy: ["補助", "自己", "連続"] },
+    
+    // --- 3ページ目 ---
+    { text: "心臓手術後は、持続点滴から [ ] カリウムなどの内服へ変更して継続する。", correct: ["ワルファリン"], dummy: ["ヘパリン", "アスピリン", "クロピドグレル"] },
+    { text: "心臓手術の術後合併症の一つに、周術期 [ ] 梗塞(PMI)がある。", correct: ["心筋"], dummy: ["脳", "肺", "腸管"] },
+    { text: "心臓手術の術後合併症として、術後出血による心 [ ] や、[ ] 炎がある。", correct: ["タンポナーデ", "縦隔"], dummy: ["不全", "心内膜", "心膜", "肺炎"] },
+    { text: "弁膜症において、弁が硬くなり可動性が低下し通過障害をきたす状態を [ ] 症といい、弁が様々な理由で閉鎖する機能が失われた状態を [ ] 症という。", correct: ["狭窄", "閉鎖不全"], dummy: ["逸脱", "逆流", "穿孔", "断裂"] },
+    { text: "弁膜症が進行すると、[ ] 症状や、脳血流低下に伴う [ ]、左 [ ] 症状が出現する。", correct: ["狭心", "失神", "心不全"], dummy: ["呼吸困難", "眩暈", "不整脈", "心室細動", "右心不全", "肺うっ血", "チアノーゼ"] },
+    { text: "弁膜症の手術により弁の狭窄や逆流が改善することで、[ ] 負荷と [ ] 負荷が変化する。", correct: ["前", "後"], dummy: ["容量", "圧", "右室", "左室"] },
+    { text: "弁膜症の術後感染として、感染性 [ ] 炎のリスクがある。", correct: ["心内膜"], dummy: ["心筋", "心膜", "縦隔"] },
+    
+    // --- 4ページ目 ---
+    { text: "ステントグラフト留置後に瘤内への血流が漏れることを [ ] という。", correct: ["エンドリーク"], dummy: ["マイグレーション", "キンキング", "スパズム"] },
+    { text: "大動脈疾患の術後の循環動態の管理として、[ ] コントロール、[ ] 出納、[ ] 管理が重要である。", correct: ["血圧", "水分", "ドレーン"], dummy: ["心拍数", "血糖", "電解質", "呼吸", "疼痛", "体温", "栄養"] },
+    { text: "大動脈疾患の術後、脊髄虚血・梗塞の予防として [ ] 麻痺の出現に注意する。", correct: ["対"], dummy: ["四肢", "片", "単"] },
+    { text: "大動脈疾患の術後合併症として、[ ] 虚血に注意する。", correct: ["下肢"], dummy: ["上肢", "脳", "腸管"] },
+    { text: "ステントグラフト治療では [ ] 腎症に注意する。", correct: ["造影剤"], dummy: ["抗菌薬", "鎮痛薬", "麻酔薬"] }
+];
+
+let questions = [];
+let currentIdx = 0;
+let score = 0;
+
+// 配列シャッフル
+function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// 初期化
+function initQuiz() {
+    questions = shuffle(rawQuestions);
+    currentIdx = 0;
+    score = 0;
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const q = questions[currentIdx];
+    const isMultiple = q.correct.length > 1;
+    const reqCount = q.correct.length;
+
+    // ヘッダー情報更新
+    document.getElementById('q-counter').innerText = `第 ${currentIdx + 1} 問 / ${questions.length} 問`;
+    document.getElementById('score-counter').innerText = `正解数: ${score}`;
+    document.getElementById('progress-bar').style.width = `${(currentIdx / questions.length) * 100}%`;
+    
+    // UIリセット
+    document.getElementById('result-area').style.display = 'none';
+    const optionsArea = document.getElementById('options-area');
+    optionsArea.innerHTML = '';
+    
+    // 問題文セット（[ ]を装飾）
+    const formattedText = q.text.replace(/\[ \]/g, '<span class="blank">?</span>');
+    document.getElementById('question-text').innerHTML = formattedText;
+
+    // 選択肢の生成
+    let allOptions = shuffle([...q.correct, ...q.dummy]);
+    
+    if (!isMultiple) {
+        document.getElementById('instruction-text').innerText = "正しいものを1つ選択してください。";
+        const grid = document.createElement('div');
+        grid.className = 'grid-options';
+        allOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'btn-option';
+            btn.innerText = opt;
+            btn.onclick = () => checkSingle(opt, q);
+            grid.appendChild(btn);
+        });
+        optionsArea.appendChild(grid);
+    } else {
+        document.getElementById('instruction-text').innerText = `正しいものを【 順不同で ${reqCount}つ 】選択してください。`;
+        const grid = document.createElement('div');
+        grid.className = 'checkbox-grid';
+        
+        allOptions.forEach((opt, i) => {
+            const label = document.createElement('label');
+            label.className = 'checkbox-label';
+            label.innerHTML = `<input type="checkbox" value="${opt}" id="chk_${i}"> ${opt}`;
+            label.onchange = () => handleCheckboxChange(reqCount);
+            grid.appendChild(label);
+        });
+        optionsArea.appendChild(grid);
+
+        const submitBtn = document.createElement('button');
+        submitBtn.className = 'btn-submit';
+        submitBtn.id = 'multi-submit-btn';
+        submitBtn.innerText = `${reqCount}つ選択して解答する`;
+        submitBtn.disabled = true;
+        submitBtn.onclick = () => checkMultiple(q);
+        optionsArea.appendChild(submitBtn);
+    }
+}
+
+// チェックボックスの制御
+function handleCheckboxChange(reqCount) {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const labels = document.querySelectorAll('.checkbox-label');
+    const checkedCount = document.querySelectorAll('input[type="checkbox"]:checked').length;
+    const submitBtn = document.getElementById('multi-submit-btn');
+
+    if (checkedCount >= reqCount) {
+        submitBtn.disabled = false;
+        checkboxes.forEach((cb, i) => {
+            if (!cb.checked) {
+                cb.disabled = true;
+                labels[i].classList.add('disabled');
+            }
+        });
+    } else {
+        submitBtn.disabled = true;
+        checkboxes.forEach((cb, i) => {
+            cb.disabled = false;
+            labels[i].classList.remove('disabled');
+        });
+    }
+}
+
+// 単一選択の判定
+function checkSingle(selected, q) {
+    const isCorrect = (selected === q.correct[0]);
+    disableAllButtons();
+    showResult(isCorrect, q);
+}
+
+// 複数選択の判定
+function checkMultiple(q) {
+    const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+    let selectedValues = Array.from(checkedBoxes).map(cb => cb.value);
+    
+    // ソートして配列比較
+    const sortedSelected = selectedValues.sort();
+    const sortedCorrect = [...q.correct].sort();
+    const isCorrect = JSON.stringify(sortedSelected) === JSON.stringify(sortedCorrect);
+    
+    disableAllButtons();
+    showResult(isCorrect, q);
+}
+
+function disableAllButtons() {
+    document.querySelectorAll('.btn-option, input[type="checkbox"], .btn-submit').forEach(el => {
+        el.disabled = true;
+    });
+}
+
+function showResult(isCorrect, q) {
+    if (isCorrect) score++;
+    document.getElementById('score-counter').innerText = `正解数: ${score}`;
+
+    const resArea = document.getElementById('result-area');
+    const resTitle = document.getElementById('result-title');
+    const resSentence = document.getElementById('full-sentence');
+
+    resArea.style.display = 'block';
+    if (isCorrect) {
+        resArea.className = 'result-area correct';
+        resTitle.className = 'result-title correct-text correct';
+        resTitle.innerText = '⭕ 正解！';
+    } else {
+        resArea.className = 'result-area incorrect';
+        resTitle.className = 'result-title correct-text incorrect';
+        resTitle.innerText = '❌ 不正解...';
+    }
+
+    // 正解の文章を復元して表示
+    let filledText = q.text;
+    q.correct.forEach(word => {
+        filledText = filledText.replace('[ ]', `<span style="color:var(--primary); text-decoration:underline;">${word}</span>`);
+    });
+    resSentence.innerHTML = filledText;
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
+        renderQuestion();
+    } else {
+        showFinal();
+    }
+}
+
+function showFinal() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('final-screen').style.display = 'block';
+    document.getElementById('final-score-num').innerText = `${score} / ${questions.length}`;
+    
+    const rate = score / questions.length;
+    let comment = "素晴らしい！循環器・心臓血管外科術後の管理が完璧に頭に入っています！";
+    if (rate < 0.9) comment = "合格ラインです！不正解だった箇所を復習して確実な知識にしましょう。";
+    if (rate < 0.6) comment = "難しいひっかけに惑わされています。繰り返し挑戦して知識を定着させましょう！";
+    
+    document.getElementById('final-comment').innerText = comment;
+}
+
+// 起動
+window.onload = initQuiz;
+</script>
+</body>
+</html>
