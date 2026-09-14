@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>川崎病 高難易度○✖クイズ</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --true-color: #10b981;
+            --false-color: #ef4444;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { width: 100%; max-width: 700px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); padding: 30px; border: 1px solid var(--border); }
+        header { text-align: center; margin-bottom: 24px; }
+        h1 { font-size: 1.6rem; color: var(--primary); margin-bottom: 8px; }
+        .meta-info { display: flex; justify-content: space-between; color: var(--text-sub); font-weight: bold; font-size: 1rem; margin-bottom: 12px; }
+        
+        .question-box { background: #f1f5f9; border-left: 6px solid var(--primary); padding: 24px; border-radius: 8px; margin-bottom: 24px; font-size: 1.2rem; line-height: 1.8; font-weight: bold; }
+        
+        .action-buttons { display: flex; gap: 16px; margin-bottom: 20px; }
+        .btn-tf { flex: 1; padding: 18px; font-size: 1.5rem; font-weight: bold; color: white; border: none; border-radius: 8px; cursor: pointer; transition: transform 0.1s, opacity 0.2s; }
+        .btn-tf:active:not(:disabled) { transform: scale(0.98); }
+        .btn-tf:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-true { background-color: var(--true-color); }
+        .btn-false { background-color: var(--false-color); }
+        
+        .result-area { display: none; padding: 20px; border-radius: 8px; margin-top: 24px; animation: fadeIn 0.4s ease; }
+        .result-area.correct { background-color: #ecfdf5; border: 1px solid #a7f3d0; }
+        .result-area.incorrect { background-color: #fef2f2; border: 1px solid #fecaca; }
+        .result-title { font-size: 1.4rem; font-weight: bold; margin-bottom: 12px; }
+        .correct-text.correct { color: #065f46; }
+        .correct-text.incorrect { color: #991b1b; }
+        
+        .full-sentence { background: white; padding: 16px; border-radius: 6px; margin: 12px 0; border-left: 4px solid var(--primary); font-weight: bold; line-height: 1.6; }
+        
+        .btn-next { width: 100%; padding: 16px; background: var(--text-main); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 16px; }
+        
+        .final-score { display: none; text-align: center; padding: 40px 0; }
+        .final-score h2 { color: var(--primary); font-size: 2rem; margin-bottom: 16px; }
+        .final-score .score-num { font-size: 3.5rem; font-weight: bold; margin: 20px 0; color: var(--text-main); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container">
+    <header>
+        <h1>川崎病 高難易度○✖クイズ</h1>
+        <p style="color: var(--text-sub); font-size: 0.9rem;">この文章の内容は正しいか、間違っているか？</p>
+    </header>
+
+    <div id="quiz-screen">
+        <div class="meta-info">
+            <span id="q-counter">第 1 問 / 18 問</span>
+            <span id="score-counter">正解: 0</span>
+        </div>
+
+        <div class="question-box" id="question-text">
+            <!-- 問題文 -->
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn-tf btn-true" id="btn-true" onclick="checkAnswer(true)">⭕ 正しい</button>
+            <button class="btn-tf btn-false" id="btn-false" onclick="checkAnswer(false)">✖ 誤り</button>
+        </div>
+
+        <div class="result-area" id="result-area">
+            <div class="result-title correct-text" id="result-title"></div>
+            <div style="font-size: 0.9rem; margin-bottom:4px; color: var(--text-sub);">【正解の文章】</div>
+            <div class="full-sentence" id="full-sentence"></div>
+            <button class="btn-next" onclick="nextQuestion()">次の問題へ ➡</button>
+        </div>
+    </div>
+
+    <div class="final-score" id="final-screen">
+        <h2>演習完了！</h2>
+        <div class="score-num" id="final-score-num">0 / 18</div>
+        <p style="margin-bottom: 30px;" id="final-comment"></p>
+        <button class="btn-next" style="background: var(--primary);" onclick="location.reload()">シャッフルして再挑戦 🔄</button>
+    </div>
+</div>
+
+<script>
+const rawQuestions = [
+    {
+        true_text: "川崎病は全身の中小血管を主体とした急性血管炎であり、約80%が4歳以下に発症し、1歳前後に多い。[cite: 10]",
+        false_text: "川崎病は全身の大血管を主体とした肉芽腫性血管炎であり、約80%が学童期に発症し、5歳から7歳前後に多い。[cite: 10]"
+    },
+    {
+        true_text: "急性血管炎の中でも冠動脈を中心にした心臓障害が後遺症を残したり、突然死の原因になる。[cite: 10]",
+        false_text: "急性血管炎の中でも大動脈を中心にした心臓障害が後遺症を残したり、慢性心不全の主な原因になる。[cite: 10]"
+    },
+    {
+        true_text: "活性化した好中球は接着因子を介して血管内皮細胞に接着して障害を引き起こし、炎症の進展に伴い中膜平滑筋層が破壊され、重症例では動脈瘤形成となる。[cite: 10]",
+        false_text: "活性化した好塩基球は接着因子を介して血管平滑筋細胞に接着して増殖を引き起こし、炎症の進展に伴い内皮細胞が肥厚し、重症例では動脈硬化性閉塞となる。[cite: 10]"
+    },
+    {
+        true_text: "川崎病の主要症状として、発熱、両側眼球結膜充血、口唇紅潮、いちご舌、非化膿性リンパ節腫脹などが挙げられる。[cite: 10]",
+        false_text: "川崎病の主要症状として、発熱、片側眼球結膜充血、アフタ性口内炎、平滑舌、化膿性リンパ節腫脹などが挙げられる。[cite: 10]"
+    },
+    {
+        true_text: "四肢末端の変化として、急性期には手足の硬性浮腫や指趾先端の紅潮がみられ、回復期には指先からの膜様落屑がみられる。[cite: 10]",
+        false_text: "四肢末端の変化として、急性期には手足の圧痕性浮腫やチアノーゼがみられ、回復期には全身の点状出血斑がみられる。[cite: 10]"
+    },
+    {
+        true_text: "参考条項として、病初期のトランスアミナーゼ値の上昇、乳児の尿中白血球増加、回復期の血小板増多がある。[cite: 10]",
+        false_text: "参考条項として、病初期の血小板増多、乳児の尿中赤血球増加、回復期のトランスアミナーゼ値低下がある。[cite: 10]"
+    },
+    {
+        true_text: "発熱後（1病日）から、6〜8日頃に動脈の内膜及び外膜の炎症細胞浸潤として始まり、冠動脈起始部に瘤ができやすい。[cite: 10]",
+        false_text: "発熱後（1病日）から、中膜の平滑筋細胞の過形成として直ちに始まり、冠動脈末梢部に微小動脈瘤ができやすい。[cite: 10]"
+    },
+    {
+        true_text: "冠動脈瘤は心エコーで発見され、急性期に瘤が4mmを超えた場合は肥厚してくる可能性があり、直径8mmを越すものは巨大動脈瘤と呼ばれる。[cite: 10]",
+        false_text: "冠動脈瘤は主に胸部単純X線で発見され、急性期に瘤が8mmを超えた場合は直ちに破裂し、直径4mmを越すものは巨大動脈瘤と呼ばれる。[cite: 10]"
+    },
+    {
+        true_text: "血栓を作る要因として、全身血管炎による凝固・線溶系の調節破綻や、発熱による脱水が挙げられる。[cite: 10]",
+        false_text: "血栓を作る要因として、全身血管炎による凝固系の著しい抑制・線溶系の亢進や、抗利尿ホルモン不適合分泌症候群(SIADH)による体液過多が挙げられる。[cite: 10]"
+    },
+    {
+        true_text: "治療の第1選択としてγ-グロブリン大量療法が行われ、副作用としてショック・アナフィラキシー症状や肝機能障害に注意する。[cite: 10]",
+        false_text: "治療の第1選択としてシクロフォスファミド大量療法が行われ、副作用として出血性膀胱炎や重篤な骨髄抑制に注意する。[cite: 10]"
+    },
+    {
+        true_text: "アスピリン療法は、抗血管炎症や血小板凝集抑制効果を期待して行われ、副作用として肝機能障害、易出血、胃荒れに注意する。[cite: 10]",
+        false_text: "アスピリン療法は、強力な抗トロンビン作用や線溶系亢進を期待して行われ、副作用として血栓形成促進、便秘、高血糖に注意する。[cite: 10]"
+    },
+    {
+        true_text: "冠動脈病変を中心とした合併症の早期発見のため、特に循環器系をチェックし、心筋梗塞発作の兆候がないか観察する。また、体力消耗を防ぐため必要以上に泣かせないよう安静に努める。[cite: 10]",
+        false_text: "冠動脈病変を中心とした合併症の早期発見のため、特に呼吸器系をチェックし、肺塞栓発作の兆候がないか観察する。また、肺合併症を防ぐため積極的に啼泣させて深呼吸を促す。[cite: 10]"
+    },
+    {
+        true_text: "脱水予防として水分出納や尿量が確保できているか確認することは、血栓予防につながる。食事は形態の変更や水分摂取に配慮する。[cite: 10]",
+        false_text: "脱水予防として厳密な水分制限を行い、乏尿を維持することは心不全予防につながる。食事は常に常食を維持して咀嚼を促す。[cite: 10]"
+    },
+    {
+        true_text: "ストレスの要因として、身体状況が厳しい、検査・処置が多い、安静制限、環境変化などが挙げられる。[cite: 10]",
+        false_text: "ストレスの要因として、面会過多による疲労や、過度なリハビリテーションによる筋肉痛が挙げられる。[cite: 10]"
+    },
+    {
+        true_text: "家族への看護として、「突然死」といった説明によるショックや、予後・γ-グロブリンへの不安に対し、説明を理解できているか確認する。[cite: 10]",
+        false_text: "家族への看護として、不安を煽らないよう「突然死」などのリスクは一切説明せず、治療法についても伏せておくことが原則である。[cite: 10]"
+    },
+    {
+        true_text: "退院の目安として、白血球数、CRP、赤沈などの炎症症状や、血小板数増多がおさまり、心臓に起こる合併症の可能性が低くなることが挙げられる。[cite: 10]",
+        false_text: "退院の目安として、発熱が1日でも下がれば直ちに退院とし、白血球数やCRPなどの炎症反応の高値は心エコーが正常なら無視してよい。[cite: 10]"
+    },
+    {
+        true_text: "退院後の生活ではストレス緩和に努め、発症1カ月時に有意な冠動脈拡大性病変が出現した場合はアスピリンの長期服用を行う。[cite: 10]",
+        false_text: "退院後の生活では直ちに激しい運動を再開し、発症1カ月時に有意な冠動脈拡大性病変が出現した場合でも抗凝固薬への切り替えのためアスピリンは直ちに中止する。[cite: 10]"
+    },
+    {
+        true_text: "治療でγ-グロブリンを投与しているため、生ワクチン（MR、水痘、ムンプスなど）の予防接種は6ヶ月以上あけてから行う。[cite: 10]",
+        false_text: "治療でアスピリンを投与しているため、不活化ワクチンを含む全ての予防接種をライ症候群予防の観点から1年以上あけてから行う。[cite: 10]"
+    }
+];
+
+let questions = [];
+let currentIdx = 0;
+let score = 0;
+let currentIsTrue = true; // 現在の問題が「正しい文章」かどうか
+
+function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function initQuiz() {
+    questions = shuffle(rawQuestions);
+    currentIdx = 0;
+    score = 0;
+    loadQuestion();
+}
+
+function loadQuestion() {
+    const q = questions[currentIdx];
+    
+    // ランダムで「正しい文章」か「間違った文章」か決定 (50%の確率)
+    currentIsTrue = Math.random() >= 0.5;
+    
+    document.getElementById('q-counter').innerText = `第 ${currentIdx + 1} 問 / ${questions.length} 問`;
+    document.getElementById('score-counter').innerText = `正解数: ${score}`;
+    
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('btn-true').disabled = false;
+    document.getElementById('btn-false').disabled = false;
+    
+    const displayText = currentIsTrue ? q.true_text : q.false_text;
+    document.getElementById('question-text').innerHTML = displayText;
+}
+
+function checkAnswer(userAnswer) {
+    const q = questions[currentIdx];
+    const isCorrect = (userAnswer === currentIsTrue);
+    
+    document.getElementById('btn-true').disabled = true;
+    document.getElementById('btn-false').disabled = true;
+    
+    if (isCorrect) score++;
+    document.getElementById('score-counter').innerText = `正解数: ${score}`;
+    
+    const resArea = document.getElementById('result-area');
+    const resTitle = document.getElementById('result-title');
+    
+    resArea.style.display = 'block';
+    if (isCorrect) {
+        resArea.className = 'result-area correct';
+        resTitle.className = 'result-title correct-text correct';
+        // ユーザーが✖と答えて正解＝文章は間違っていた。そのことに対する言及。
+        if (!currentIsTrue) {
+            resTitle.innerText = '⭕ 正解！（この文章は間違っています）';
+        } else {
+            resTitle.innerText = '⭕ 正解！';
+        }
+    } else {
+        resArea.className = 'result-area incorrect';
+        resTitle.className = 'result-title correct-text incorrect';
+        resTitle.innerText = '❌ 不正解...';
+    }
+    
+    // 常に正しい文章をフィードバックに表示
+    document.getElementById('full-sentence').innerHTML = q.true_text;
+}
+
+function nextQuestion() {
+    currentIdx++;
+    if (currentIdx < questions.length) {
+        loadQuestion();
+    } else {
+        showFinal();
+    }
+}
+
+function showFinal() {
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('final-screen').style.display = 'block';
+    document.getElementById('final-score-num').innerText = `${score} / ${questions.length}`;
+    
+    const rate = score / questions.length;
+    let comment = "完璧です！周辺知識の引っ掛けにも全く動じない素晴らしい理解力です！";
+    if (rate < 0.9) comment = "素晴らしい成績です！間違えた箇所の医学的根拠を再確認しましょう。";
+    if (rate < 0.7) comment = "難しいひっかけに少し苦戦したようです。正しい病態生理を復習しましょう！";
+    
+    document.getElementById('final-comment').innerText = comment;
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
